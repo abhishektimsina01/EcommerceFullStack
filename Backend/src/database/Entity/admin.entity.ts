@@ -1,16 +1,17 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
+
 @Entity()
-export class Customer {
+export class Admin{
+
     @PrimaryGeneratedColumn({type : "int"})
-    customer_id !: number
+    admin_id !: number
 
     @Column({type : "varchar"})
     username !: string
 
     @OneToOne(() => User)
-    @JoinColumn({name : "user_id"})
     user !: User
 
 }
