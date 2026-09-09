@@ -16,14 +16,16 @@ export class User {
     @Column({type : "varchar"})
     password !: string
 
+    @Column({type : "varchar"})
+    username !: string
+
     @Column({type : "enum", enum : ROLES, default : ROLES.CUSTOMER})
     role !: ROLES
 
-    @Column({type : "int", precision : 10})
-    phone_numebr !: number
+    @Column({type : "bigint", precision : 10}) 
+    phone_number !: number
 
     @OneToOne(() => Address, (address) => address.user)
-    @JoinColumn({name : "address_id"})  
     address !: Address
 
     @CreateDateColumn()

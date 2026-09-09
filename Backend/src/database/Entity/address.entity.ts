@@ -1,5 +1,4 @@
-import { create } from "node:domain";
-import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user.entity";
 
 
@@ -15,11 +14,11 @@ export class Address {
     @Column({type : "varchar"})
     state !: string
 
-    @Column({type : "varchar"})
-    address_line !: string
+    @Column({type : "varchar", nullable : true})
+    address_line !: string | null
 
-    @Column({type : "int"})
-    postal_code !: number
+    @Column({type : "varchar", nullable : true})
+    postal_code !: string | null
 
     @Column({type : "decimal"})
     longitude !: number
@@ -27,7 +26,8 @@ export class Address {
     @Column({type : "decimal"})
     latitude !: number
 
-    @OneToOne(() => User, (user) => user.address)
+    @OneToOne(() => User, (user) => user.address, {onDelete : "CASCADE"})
+    @JoinColumn({name : "user_id"})
     user !: User
 
     @CreateDateColumn()
