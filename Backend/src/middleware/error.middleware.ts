@@ -9,10 +9,11 @@ export const notFound = (req : Request, res : Response, next : NextFunction) => 
         message : "not found"
     }]
     const err = new APIError("Page not found", 404, detail)
+    err.name = "PAGE_NOT_FOUND"
     next(err)
 }
 
-export const errorHandler = <T extends APIError>(err : T, req : Request, res : Response, next : NextFunction | null= null) => {
+export const errorHandler = (err : APIError, req : Request, res : Response, next : NextFunction) => {
     console.log("error occurred❌")
     return sendErrorResponse(res, err.name, err.message, err.statusCode, err.details)
 }

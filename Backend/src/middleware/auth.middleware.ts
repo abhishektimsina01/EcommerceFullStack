@@ -1,10 +1,32 @@
 import { NextFunction, Request, Response } from "express";
 import { ROLES } from "../enum/enums";
-import { AuthotizationError } from "../exceptions/custom.exceptions";
+import { AuthenticationError, AuthotizationError } from "../exceptions/custom.exceptions";
+import { verifyAccessToken } from "../utils/jwt.utils";
+import { IjwtData, Ipayload } from "../interface/interfaces";
+import { UserRepository } from "../repository/user.repository";
+import { error } from "node:console";
 
-export const authenticate = (req : Request, res : Response, next : NextFunction) => {
+const userRepo = new UserRepository()
+
+export const authenticate = async (req : Request, res : Response, next : NextFunction) => {
     try{
-        // verify the token and extract the payload
+        // try to access the token from the cookie
+        const {access_token} = req.cookies
+        console.log(access_token)
+        if(!access_token){
+            throw new AuthenticationError("LOGIN", "no token found please login")
+        }
+        const payload : Ipayload = verifyAccessToken(access_token) as Ipayload
+        const user = await userRepo.findUser("user_id", payload.id)
+        if(!user){
+            throw new AuthenticationError("USER_NOT_FOUND", "no user was found")
+        }
+        req.user = {
+            id : payload.id,
+            username : payload.username,
+            role : payload.role
+        }
+        next()
     }
     catch(err){
         next(err)
