@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ITEM_CATEGORY } from "../../enum/enums";
 import { Provider } from "./provider.entity";
-import { Product_Item } from "./product_item.entity";
 
 @Entity()
 export class Product {
@@ -21,11 +20,14 @@ export class Product {
     @Column({type : "varchar", nullable : true})
     product_image !: string
 
+    @Column({type : "int", scale : 2})
+    price !: number
+
+    @Column({type : "int"})
+    stock !: number
+    
     @ManyToOne(() => Provider, (provider) => provider.products, {onDelete : "CASCADE"})
     @JoinColumn({name : "provider_name"})
     provider !: Provider
-
-    @OneToMany(() => Product_Item, (item) => item.product)
-    items !: Product_Item[]
 
 }
