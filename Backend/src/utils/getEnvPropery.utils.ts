@@ -1,13 +1,13 @@
 import dotenv from "dotenv"
+import { APIError } from "../exceptions/custom.exceptions"
 dotenv.config()
 
-export const getEnvProperty = (key : string) => {
+export const getEnvProperty = (key : string): string => {
     if(Object.hasOwn(process.env, key)){
-        if(process.env[key] == "" && process.env.key == undefined){
-            throw new Error("no env key found")
-        }
-        else{
-            return process.env[key]
+        const value = process.env[key]
+        if(value != "" && value != undefined){
+            return value
         }
     }
+    throw new APIError("no env key found", 404)
 }
