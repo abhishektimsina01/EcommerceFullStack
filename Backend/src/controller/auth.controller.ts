@@ -22,7 +22,7 @@ export const authLogIn = async(req : Request, res : Response, next : NextFunctio
         const {access_token, refresh_token, ...safeData} = response
         setCookies(res, "access_token", access_token)
         setCookies(res, "refresh_token", refresh_token)
-        return sendAPIResponse(res, "Logged In", HTTP_STATUS.SUCCESS.OK.CODE, safeData)
+        return sendAPIResponse(res, "Logged In", HTTP_STATUS.SUCCESS.OK.CODE, {...safeData, access_token, refresh_token})
     }
     catch(err){
         next(err)
@@ -43,7 +43,6 @@ export const authSignUp = async (req : Request, res : Response, next : NextFunct
         return sendAPIResponse(res, "user regsitered", HTTP_STATUS.SUCCESS.OK.CODE, response)
     }
     catch(err){
-        console.log(err)
         next(err)   
     }
 
