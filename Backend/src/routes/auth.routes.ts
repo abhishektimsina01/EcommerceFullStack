@@ -5,6 +5,6 @@ import { ROLES } from "../enum/enums";
 
 export const authRouter = Router()
 
-authRouter.post("/login", authLogIn)
-authRouter.post("/signup", authSignUp)
-authRouter.get("/logout", authenticate, authorize(...Object.values(ROLES)), authLogOut)
+authRouter.post("/auth/login", authLogIn)
+authRouter.post("/auth/signup", authSignUp)
+authRouter.get("/auth/logout", authenticate, authorize(...Object.values(ROLES)), authLogOut)
