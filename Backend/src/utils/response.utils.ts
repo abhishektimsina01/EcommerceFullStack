@@ -2,7 +2,6 @@ import { Response } from "express";
 import { detailType } from "../types/types";
 
 export const sendErrorResponse = <T>(res : Response, name : string, message : string, statusCode : number, details : detailType<T>) => {
-    console.log(typeof statusCode)
     return res.status(statusCode).json({
         error : true,
         name : name,
