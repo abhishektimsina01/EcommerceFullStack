@@ -4,7 +4,6 @@ import { appDataSource } from "../database/connect.db";
 import { Ifilters, IjwtData, IproductItem } from "../interface/interfaces";
 import { ROLES } from "../enum/enums";
 import { ResturantProjection } from "../constant/project.constant";
-import { RoleHelper } from "../helper/role.helper";
 
 
 export class ProductRepository {
@@ -32,21 +31,21 @@ export class ProductRepository {
         })
     }
 
-    public createProduct = async (userData : IjwtData, productData : IproductItem) => {
+    public createProduct = async (provider_id : number, productData : IproductItem) => {
         const product = this.productRepo.create({
             ...productData,
             provider : {
-                provider_id : userData.id
+                provider_id : provider_id
             }
         })
         return await this.productRepo.save(product)
     }
 
-    public findAllProductsProvider = async (userData : IjwtData) => {
+    public findAllProductsProvider = async (provider_id : number) => {
             return this.productRepo.find({
                 where : {
                     provider : {
-                        provider_id : userData.id
+                        provider_id : provider_id
                     }
                 },
                 select : {

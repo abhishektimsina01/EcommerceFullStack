@@ -11,9 +11,12 @@ export class ProviderRepository {
         this.providerRepo = appDataSource.getRepository(Provider)
     }
 
-    public createProvider = async (providerData : providerType) => {
+    public createProvider = async (providerData : providerType, user_id : number) => {
         const provider = this.providerRepo.create({
-            ...providerData
+            ...providerData,
+            user : {
+                user_id : user_id
+            }
         })
         return await this.providerRepo.save(provider)
     }

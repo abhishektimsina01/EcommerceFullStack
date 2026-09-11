@@ -19,6 +19,8 @@ export class UserRepository {
             select : {
                 user_id : true,
                 email : true,
+                role : true,
+                username : true,
                 password : is_password,
                 address : {
                     address_id : true,
