@@ -17,8 +17,8 @@ export const createProduct = async (req : Request, res : Response, next : NextFu
         if(error){
             throw new ValidationError(error)
         }
-        console.log(req.body)
-        const response = await productService.createProduct(req.user, req.body)
+        const path = req.file?.path ?? null
+        const response = await productService.createProduct(req.user, req.body, path)
         return sendAPIResponse(res, "product added", 200, response)
     }
     catch(err){
