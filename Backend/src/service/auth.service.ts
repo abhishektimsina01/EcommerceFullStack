@@ -1,11 +1,12 @@
 import { ROLES } from "../enum/enums";
 import { AuthenticationError } from "../exceptions/custom.exceptions";
-import { IjwtData, ILogIn, IproviderSignUp } from "../interface/interfaces";
+import { IjwtData, ILogIn, IproductItem, IproviderSignUp } from "../interface/interfaces";
 import { AddressRepository } from "../repository/address.repository";
 import { CustomerRepository } from "../repository/customer.repository";
 import { ProviderRepository } from "../repository/provider.repository";
 import { UserRepository } from "../repository/user.repository";
-import { signUpType } from "../types/types";
+import { providerType, signUpType } from "../types/types";
+import { extractKeysFromObj } from "../utils/checkKeyAndRetrieveValue";
 import { signToken } from "../utils/jwt.utils";
 import { comparePassword, hashPassword } from "../utils/password.utils";
 
@@ -40,7 +41,7 @@ export class AuthService {
         }
         const {access_token, refresh_token} = signToken(data)
         return {
-            data,
+            ...data,
             access_token, 
             refresh_token
         }
@@ -49,12 +50,11 @@ export class AuthService {
     public signupService = async( userData : signUpType) => {
         const {username, email, password, role, phone_number, address, ...otherData} = userData  
         let safeData = {}
-        await this.userRepo.deleteAllUsers() 
+        // await this.userRepo.deleteAllUsers()
         const isUser = await this.userRepo.findUser("email", email)
         if(isUser){
             throw new AuthenticationError("ALREADY_EXIST", "user already exist")
         }
-
         const added_address = await this.addressRepo.addAddress(address)
         const address_id = added_address.address_id
         const hashedPassword = await hashPassword(password)
@@ -69,6 +69,7 @@ export class AuthService {
             }
         }
         const user = await this.userRepo.createUser(userPayoad)
+        console.log(user)
         const {access_token, refresh_token} = signToken({
             id : user.user_id,
             username : user.username,
@@ -83,17 +84,12 @@ export class AuthService {
             }
         }
         else{
-            const {store_name, opening_time, closing_time} = userData as IproviderSignUp
-            const provider = await this.providerRepo.createProvider({
-                store_name,
-                opening_time,
-                closing_time,
-                user_id : user.user_id
-            })
+            const createPayload = extractKeysFromObj(userData, ["store_name", "opening_time", "closing_time"])
+            const provider = await this.providerRepo.createProvider({...(createPayload as providerType)}, user.user_id)
             safeData =  {
                 user_id : user.user_id,
                 username : user.username,
-                store_name,
+                store_name : createPayload.store_name,
                 provider_id : provider.provider_id
             }
         }

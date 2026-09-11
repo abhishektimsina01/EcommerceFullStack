@@ -6,6 +6,9 @@ import { Ifilters, IjwtData, IproductItem } from "../interface/interfaces";
 import { ProductRepository } from "../repository/product.repository";
 import { ProviderRepository } from "../repository/provider.repository";
 import { extractKeysFromObj } from "../utils/checkKeyAndRetrieveValue";
+import { uploader } from "../utils/cloudinary.utils";
+import { UploadApiResponse } from "cloudinary";
+import { OneToManySubjectBuilder } from "typeorm/persistence/subject-builder/OneToManySubjectBuilder.js";
 
 
 export class ProductService {
@@ -26,6 +29,7 @@ export class ProductService {
             const err =  new APIError("product couldnot be found", 404)
             throw err
         }
+        else{
         if(this.roleHelper.isCustomer(role) || this.roleHelper.isAdmin(role)){
             const product = await this.productRepo.findProductItem("product_id", productId, role)
             return product
@@ -36,28 +40,45 @@ export class ProductService {
             if(!providerData){
                 throw new AuthenticationError("PROVIDER_NOT_FOUND", "provider was not found")
             }
-            const product = await this.productRepo.findProductItem("provider", { provider_id : providerData.provider_id}, role)
+            const product = await this.productRepo.findProductItem("product_id", productId, userData.role)
             if(!product){
+                const err =  new APIError("product couldnot be found", 404)
+                throw err
+            }
+            if(product.provider.provider_id != providerData.provider_id){
                 throw new AuthotizationError("you cannot access the product")
             }
             return product
         }
+        }
     }
 
-    public createProduct = async (userData : IjwtData, productData : IproductItem) => {
+    public createProduct = async (userData : IjwtData, productData : IproductItem, path : string | null = null) => {
         const provider = await this.providerRepo.findOneProvider("user", {
             user_id : userData.id
         })
         if(!provider){
             throw new AuthenticationError("PROVIDER_NOT_FOUND", "the provider was not found")
         }
+        if(path){
+            const cloud_path : UploadApiResponse = await uploader(path)
+            productData.product_image = cloud_path.secure_url
+        }
         const productItem = await this.productRepo.createProduct(provider.provider_id as number, productData)
         return productItem
-    }   
+    }
 
     public getAllProducts = async (userData : IjwtData, filters : Ifilters) => {
         if(this.roleHelper.isProvider(userData.role)){
-            const products = await this.productRepo.findAllProductsProvider(userData)
+            const provider = await this.providerRepo.findOneProvider("user", {
+                user_id : userData.id
+            })
+            if(!provider){
+                throw new AuthenticationError("PROVIDER_NOT_FOUND", "provider nt found")
+            }
+            console.log(provider)
+            const products = await this.productRepo.findAllProductsProvider(provider.provider_id)
+            console.log(products)
             return products
         }
         else if(this.roleHelper.isCustomer(userData.role)){
@@ -88,7 +109,13 @@ export class ProductService {
     }
 
     public deleteProduct = async (userData : IjwtData, productId : number) => {
-        const products = await this.productRepo.findAllProductsProvider(userData)
+        const provider = await this.providerRepo.findOneProvider("user", {
+            user_id : userData.id
+        })
+        if(!provider){
+            throw new AuthenticationError("PROVIDER_NOT_FOUND", "provider nt found")
+        }
+        const products = await this.productRepo.findAllProductsProvider(provider.provider_id)
         const DoesContain = products.some((product) => {
             if(product.product_id == productId){
                 return true
@@ -103,7 +130,13 @@ export class ProductService {
     }
 
     public updateProduct = async (userData : IjwtData, productId : number, productData : Partial<IproductItem>) => {
-        const products = await this.productRepo.findAllProductsProvider(userData)
+        const provider = await this.providerRepo.findOneProvider("user", {
+            user_id : userData.id
+        })
+        if(!provider){
+            throw new AuthenticationError("PROVIDER_NOT_FOUND", "provider nt found")
+        }
+        const products = await this.productRepo.findAllProductsProvider(provider.provider_id)
         const DoesContain = products.some((product) => {
             if(product.product_id == productId){
                 return true
