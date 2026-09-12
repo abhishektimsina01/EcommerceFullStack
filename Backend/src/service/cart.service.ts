@@ -37,6 +37,17 @@ export class ShopCartService {
             const new_cart = await this.shopCartRepo.createCart(customerId)
             cartId = new_cart.cart_id
         }
+        else{
+            const itemsInCart = await this.shopCartRepo.findCartItems(cartId as number)
+            const containsProduct = itemsInCart.some((item) => {
+                if(item.product_item.product_id === productId){
+                    return true
+                }
+            })
+            if(containsProduct){
+                return {}
+            }
+        }
 
         const cartItem = await this.shopCartRepo.addItemInCart(cartId as number, productId)
         return cartItem
@@ -86,5 +97,6 @@ export class ShopCartService {
         const customerId = customer.customer_id
         const shopCart = await this.shopCartRepo.findCart(customerId) as ShopCart
         const updatedCart = await this.shopCartRepo.updateItem(shopCart.cart_id, productId, qty)
+        return updatedCart
     }
 }
