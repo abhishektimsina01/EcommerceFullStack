@@ -3,6 +3,7 @@ import { Customer } from "./customer.entity";
 import { OrderItem } from "./order_item.entity";
 import { ORDER_STATUS } from "../../enum/enums";
 import { Payment } from "./payment.entity";
+import { Address } from "./address.entity";
 
 @Entity()
 export class Order {
@@ -19,6 +20,10 @@ export class Order {
 
     @Column({type : "varchar", nullable : true})
     session_id !: string
+
+    @OneToOne(() => Address)
+    @JoinColumn({name : "address_id"})
+    address !: Address
 
     @OneToOne(() => Payment, (payment) => payment.order, {nullable : true})
     @JoinColumn({name : "payment_id"})

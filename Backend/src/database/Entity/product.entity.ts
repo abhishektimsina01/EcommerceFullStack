@@ -22,12 +22,12 @@ export class Product {
 
     @Column({type : "int", scale : 2})
     price !: number
-
+    
     @Column({type : "int"})
     stock !: number
     
     @ManyToOne(() => Provider, (provider) => provider.products, {onDelete : "CASCADE"})
-    @JoinColumn({name : "provider_name"})
+    @JoinColumn({name : "provider_id"})
     provider !: Provider
 
 }

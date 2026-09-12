@@ -1,6 +1,6 @@
-import { Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ShopCart } from "./shop_cart.entity";
-import { Product_Item } from "./product_item.entity";
+import { Product } from "./product.entity";
 
 @Entity()
 export class ShopCartItem {
@@ -8,12 +8,15 @@ export class ShopCartItem {
     @PrimaryGeneratedColumn({type : "int"})
     cart_item_id !: number
 
+    @Column({type : "int", default : 1})
+    quantity !: number
+
     @ManyToOne(() => ShopCart, (cart) => cart.items, {onDelete : "CASCADE"})
     @JoinColumn({name : "cart_id"})
     cart !: ShopCart
 
-    @OneToOne(() => Product_Item, {onDelete : "CASCADE"})
+    @ManyToOne(() => Product, {onDelete : "CASCADE"})
     @JoinColumn({name : "product_item_id"})
-    product_item !: Product_Item
+    product_item !: Product
 
 }
