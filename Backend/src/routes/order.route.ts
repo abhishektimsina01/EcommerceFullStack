@@ -1,0 +1,12 @@
+import { Router } from "express";
+import { authenticate, authorize } from "../middleware/auth.middleware";
+import { ROLES } from "../enum/enums";
+import { changeOrderState, deleteOrder, makeOrder, viewOrder, viewOrders } from "../controller/order.controller";
+
+export const orderRouter = Router()
+
+orderRouter.post("/orders", authenticate, authorize(ROLES.CUSTOMER), makeOrder)
+orderRouter.get("/orders", authenticate, authorize(ROLES.CUSTOMER, ROLES.PROVIDER), viewOrders)
+orderRouter.get("/orders/:id", authenticate as any, authorize(ROLES.CUSTOMER, ROLES.PROVIDER) as any, viewOrder)
+orderRouter.delete("/orders", authenticate as any, authorize(ROLES.CUSTOMER, ROLES.PROVIDER) as any, deleteOrder)
+orderRouter.get("/orders/:id", authenticate as any, authorize(ROLES.PROVIDER) as any, changeOrderState)
