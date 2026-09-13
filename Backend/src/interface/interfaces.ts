@@ -1,4 +1,6 @@
-import { ITEM_CATEGORY, ROLES } from "../enum/enums"
+import { ITEM_CATEGORY, ORDER_STATUS, ROLES } from "../enum/enums"
+
+// interference is ez, jun typeko data aaune ho tei type banaune ho !?!?!
 
 export interface Time {
     date ?: number
@@ -77,4 +79,59 @@ export interface Ifilters {
     max ?: number 
     min ?: number
     stock ?: number
+}
+
+export interface Iorder {
+    product : {
+        product_id : number
+        quantity : number
+    }[]
+    current_address : {
+        address ?: Iaddress
+        default_address ?: boolean
+    }
+}
+
+export interface Iproduct {
+    item_id : number
+    product_id : number, 
+    product_image : string,
+    description ?: string,
+    product_name : string,
+    price : number
+    quantity : number
+}
+
+export interface IordersProvider {
+    order_id : number
+    status : ORDER_STATUS
+    cutomer : {
+        customer_id : number
+        username : string
+    },
+    payment_id : number | null
+    product : Iproduct[]
+}
+
+export interface IorderCustomer {
+    order_id : number
+    status : ORDER_STATUS
+    items : {
+        item_id : number,
+        price : number,
+        quantity : number,
+        product : {
+            product_id : number,
+            product_name : string,
+            product_image : string,
+            description : string,
+            provider : {
+                provider_id : number,
+                user : {
+                    username : string
+                }
+            }
+        }
+    }[],
+    payment_id : number | null
 }
