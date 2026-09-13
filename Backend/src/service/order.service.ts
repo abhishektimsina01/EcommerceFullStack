@@ -1,15 +1,19 @@
-import { timeStamp } from "node:console"
 import { HTTP_STATUS } from "../constant/http_status.constant"
 import { User } from "../database/Entity/user.entity"
 import { ROLES } from "../enum/enums"
 import { APIError, AuthenticationError } from "../exceptions/custom.exceptions"
-import { IjwtData, Iorder } from "../interface/interfaces"
+import { IjwtData, Iorder, IorderCustomer, IordersProvider } from "../interface/interfaces"
 import { AddressRepository } from "../repository/address.repository"
 import { ShopCartRepository } from "../repository/cart.repository"
 import { CustomerRepository } from "../repository/customer.repository"
 import { OrderRepository } from "../repository/order.repository"
 import { ProductRepository } from "../repository/product.repository"
 import { UserRepository } from "../repository/user.repository"
+import { RoleHelper } from "../helper/role.helper"
+import { ProviderRepository } from "../repository/provider.repository"
+import { Customer } from "../database/Entity/customer.entity"
+import { Provider } from "../database/Entity/provider.entity"
+import { it } from "node:test"
 
 
 export class OrderService {
@@ -17,9 +21,11 @@ export class OrderService {
     private userRepo : UserRepository
     private orderRepo : OrderRepository
     private customerRepo : CustomerRepository
+    private providerRepo : ProviderRepository
     private shopCartRepo : ShopCartRepository
     private productRepo : ProductRepository
     private addressRepo : AddressRepository
+    private roleHelper : RoleHelper
 
     constructor(){
         this.orderRepo = new OrderRepository()
@@ -28,6 +34,8 @@ export class OrderService {
         this.productRepo = new ProductRepository()
         this.addressRepo = new AddressRepository()
         this.userRepo = new UserRepository()
+        this.providerRepo = new ProviderRepository()
+        this.roleHelper = new RoleHelper()
     }
 
     public makeOrder = async (userData : IjwtData, orderData : Iorder) => {
@@ -55,11 +63,21 @@ export class OrderService {
                 if(!fetched_product){
                     throw new AuthenticationError("NOT_FOUND", "product not found")
                 }
-                const order_item = await this.orderRepo.addOrderItems({
+                if(product.quantity > fetched_product.stock){
+                    // item out of the stock oh no!!!
+                    await this.orderRepo.deleteOrder(order.order_id)
+                    throw new APIError("order failed", 404, {
+                        content : "quantity more than the stock"
+                    })
+                }
+                await this.orderRepo.addOrderItems({
                     product_id : product.product_id,
                     price : fetched_product.price,
                     quantity : product.quantity
                 }, order.order_id)
+                await this.productRepo.updateProduct(product.product_id, {
+                    stock : fetched_product.stock - product.quantity
+                })
             }
             if(isCart){
                 await this.shopCartRepo.deleteCartItem(isCart.cart_id, [...products.map((product) => {
@@ -74,15 +92,80 @@ export class OrderService {
         }    
     }
 
-    public viewOrders = async () => {
-
-    }
+    public viewOrders = async (userData : IjwtData) => {
+        if(this.roleHelper.isCustomer(userData.role)){
+            const customer = await this.customerRepo.findCustomer("user", {
+                user_id : userData.id
+            }) as Customer
+            const orders = await this.orderRepo.getOrders(customer.customer_id)
+            let response : IorderCustomer[] = []
+            for(let order of orders){
+                const orderFormt : IorderCustomer= {
+                    order_id : order.order_id,
+                    status : order.status,
+                    payment_id : order?.payment?.payment_id ?? null,
+                    items : order.items
+                }
+                response.push(orderFormt)
+            }
+            return response 
+        }
+        else if(this.roleHelper.isProvider(userData.role)){
+            const provider = await this.providerRepo.findOneProvider("user", {
+                user_id : userData.id
+            }, true) as Provider
+            const product_ids : number[] = provider.products.map((product) => {
+                return product.product_id
+            })
+            const orderedItems = await this.orderRepo.getOrderItem(product_ids)
+            // grouping the orders
+            let orders : Record<number, IordersProvider> = {}
+            let orderIds : number[] = []
+            for(let item of orderedItems){
+                if(orderIds.includes(item.order.order_id)){
+                    // items in this order already found
+                    orders[item.order.order_id].product.push({
+                        item_id : item.item_id,
+                        price : item.price,
+                        quantity : item.quantity,
+                        product_id : item.product.product_id,
+                        description : item.product.description,
+                        product_name : item.product.product_name,
+                        product_image : item.product.product_image
+                    })  
+                }
+                else{
+                    // items in this order not found so add them
+                    orders[item.order.order_id] = {
+                        order_id : item.order.order_id,
+                        status : item.order.status,
+                        cutomer : {
+                            customer_id : item.order.customer.customer_id,
+                            username : item.order.customer.user.username
+                        },
+                        payment_id : item.order?.payment?.payment_id ?? null,
+                        product : [{
+                            item_id : item.item_id,
+                            price : item.price,
+                            quantity : item.quantity,
+                            product_id : item.product.product_id,
+                            description : item.product.description,
+                            product_name : item.product.product_name,
+                            product_image : item.product.product_image
+                        }]
+                    }
+                    }
+                    orderIds.push(item.order.order_id)
+                }
+                return Object.values(orders)
+            }
+        }
 
     public changeOrderState = async () => {
 
     }
 
     public deleteOrder = async () => {
-
+        
     }
 }
