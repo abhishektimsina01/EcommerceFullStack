@@ -24,9 +24,11 @@ export const makeOrder = async (req : Request, res : Response, next : NextFuncti
 
 export const viewOrders = async (req : Request, res : Response, next : NextFunction) => {
     try{
-
+        const response = await orderService.viewOrders(req.user)
+        return sendAPIResponse(res, "orders", 200, response)
     }
     catch(err){
+        console.log(err)
         next(err)
     }
 }

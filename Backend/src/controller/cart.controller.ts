@@ -55,7 +55,7 @@ export const editItemInCart = async (req : Request<Iparams>, res : Response, nex
             throw err
         }
         const response = await shopCartservice.editCartItem(req.user, +req.params.id, qty)
-        return sendAPIResponse(res, "updated", 200)
+        return sendAPIResponse(res, "updated", 200, response)
     }
     catch(err){
         next(err)
