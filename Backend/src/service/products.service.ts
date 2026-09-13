@@ -61,8 +61,9 @@ export class ProductService {
             throw new AuthenticationError("PROVIDER_NOT_FOUND", "the provider was not found")
         }
         if(path){
-            const cloud_path : UploadApiResponse = await uploader(path)
-            productData.product_image = cloud_path.secure_url
+            // const cloud_path : UploadApiResponse = await uploader(path)
+            // productData.product_image = cloud_path.secure_url
+            productData.product_image = "image"
         }
         const productItem = await this.productRepo.createProduct(provider.provider_id as number, productData)
         return productItem
