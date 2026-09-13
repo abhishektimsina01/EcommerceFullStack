@@ -15,4 +15,10 @@ export class AddressRepository {
         const new_address = this.addressRepo.create(address)
         return await this.addressRepo.save(new_address)
     }
+
+    public deleteAddress = async (addressId : number) => {
+        await this.addressRepo.delete({
+            address_id : addressId
+        })
+    }
 }

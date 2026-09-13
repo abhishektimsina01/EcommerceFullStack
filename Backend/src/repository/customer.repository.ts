@@ -17,8 +17,8 @@ export class CustomerRepository {
             select : {
                 customer_id : true,
                 user : {
-                    user_id : true
-                }
+                    user_id : true,
+                },
             },
             relations : {
                 user : true

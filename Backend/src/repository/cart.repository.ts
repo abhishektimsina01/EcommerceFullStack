@@ -18,6 +18,15 @@ export class ShopCartRepository {
                 customer : {
                     customer_id : customer_id
                 }
+            },
+            select : {
+                cart_id : true,
+                items : {
+                    cart_item_id : true
+                }
+            },
+            relations : {
+                items : true
             }
         })
     }
@@ -38,6 +47,9 @@ export class ShopCartRepository {
                     price : true,
                     product_type : true
                 },
+            },
+            relations : {
+                product_item : true
             }
         })
     }
@@ -75,7 +87,7 @@ export class ShopCartRepository {
                 }
             }
         })
-        return await this.shopCartItemRepo.save(cartItem)
+        return await this.shopCartItemRepo.remove(cartItem)
     }
 
     public updateItem = async (cart_id : number, product_id : number, qty : number) => {

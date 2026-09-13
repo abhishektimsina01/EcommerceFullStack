@@ -21,7 +21,12 @@ export class ProviderRepository {
         return await this.providerRepo.save(provider)
     }
 
-    public findOneProvider = async <T>(key : string, value : T) => {
+    public findOneProvider = async <T>(key : string, value : T, items : boolean = false,) => {
+        const products = {
+            products : {
+                product_id : items
+            }
+        }
         const provider = await this.providerRepo.findOne({
             where : {
                 [`${key}`] : value
@@ -30,6 +35,10 @@ export class ProviderRepository {
                 provider_id : true,
                 store_name : true,
                 status : true,
+                ...products
+            },
+            relations : {
+                products : true
             }
         })
         return provider
