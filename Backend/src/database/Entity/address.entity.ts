@@ -26,10 +26,6 @@ export class Address {
     @Column({type : "decimal"})
     latitude !: number
 
-    @OneToOne(() => User, (user) => user.address, {onDelete : "CASCADE"})
-    @JoinColumn({name : "user_id"})
-    user !: User
-
     @CreateDateColumn()
     created_at !: Date
 

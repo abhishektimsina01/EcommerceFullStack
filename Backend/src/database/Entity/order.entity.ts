@@ -21,7 +21,7 @@ export class Order {
     @Column({type : "varchar", nullable : true})
     session_id !: string
 
-    @OneToOne(() => Address)
+    @OneToOne(() => Address, {onDelete : "CASCADE"})
     @JoinColumn({name : "address_id"})
     address !: Address
 

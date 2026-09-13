@@ -25,7 +25,8 @@ export class User {
     @Column({type : "bigint", precision : 10}) 
     phone_number !: number
 
-    @OneToOne(() => Address, (address) => address.user)
+    @OneToOne(() => Address, {onDelete : "CASCADE"})
+    @JoinColumn({name : "address_id"})
     address !: Address
 
     @CreateDateColumn()
