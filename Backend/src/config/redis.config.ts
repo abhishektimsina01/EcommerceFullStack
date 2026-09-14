@@ -10,6 +10,10 @@ redisClient.on("error", (error) => {
     console.log("redis connection lost")
 })
 
+redisClient.on("ready", () => {
+    console.log("redis is ready to be used")
+})
+
 // connection with the redis client
 export const connectRedis = async () => {
     await redisClient.connect()
