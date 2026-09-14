@@ -13,7 +13,7 @@ import { RoleHelper } from "../helper/role.helper"
 import { ProviderRepository } from "../repository/provider.repository"
 import { Customer } from "../database/Entity/customer.entity"
 import { Provider } from "../database/Entity/provider.entity"
-import { it } from "node:test"
+import { redisClient } from "../config/redis.config"
 
 
 export class OrderService {
@@ -84,6 +84,8 @@ export class OrderService {
                     return product.product_id
                 })])
             }
+            await redisClient.del(`viewOrder:${userData.id}`)
+
         }
         else{
             const error = new APIError("please send the product to order", HTTP_STATUS.CLIENT_ERROR.UNAUTHORIZED.CODE)
@@ -94,6 +96,9 @@ export class OrderService {
 
     public viewOrders = async (userData : IjwtData) => {
         if(this.roleHelper.isCustomer(userData.role)){
+            if(await redisClient.exists(`viewOrder:${userData.id}`) != 0){
+                return await redisClient.get(`viewOrder:${userData.id}`)
+            }
             const customer = await this.customerRepo.findCustomer("user", {
                 user_id : userData.id
             }) as Customer
@@ -108,6 +113,7 @@ export class OrderService {
                 }
                 response.push(orderFormt)
             }
+            await redisClient.set(`viewOrders:${userData.id}`, JSON.stringify(response))
             return response 
         }
         else if(this.roleHelper.isProvider(userData.role)){
@@ -161,11 +167,11 @@ export class OrderService {
             }
         }
 
-    public changeOrderState = async () => {
+    public changeOrderState = async (userData : IjwtData) => {
 
     }
 
-    public deleteOrder = async () => {
+    public deleteOrder = async (userData : IjwtData, order_id : number) => {
         
     }
 }
