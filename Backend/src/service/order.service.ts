@@ -1,8 +1,8 @@
 import { HTTP_STATUS } from "../constant/http_status.constant"
 import { User } from "../database/Entity/user.entity"
-import { ROLES } from "../enum/enums"
+import { ORDER_STATUS, ROLES } from "../enum/enums"
 import { APIError, AuthenticationError } from "../exceptions/custom.exceptions"
-import { IjwtData, Iorder, IorderCustomer, IordersProvider } from "../interface/interfaces"
+import { IjwtData, Iorder, IorderCustomer, IordersProvider, IsingleOrderCustomer } from "../interface/interfaces"
 import { AddressRepository } from "../repository/address.repository"
 import { ShopCartRepository } from "../repository/cart.repository"
 import { CustomerRepository } from "../repository/customer.repository"
@@ -138,7 +138,7 @@ export class OrderService {
                         description : item.product.description,
                         product_name : item.product.product_name,
                         product_image : item.product.product_image
-                    })  
+                    })
                 }
                 else{
                     // items in this order not found so add them
@@ -166,12 +166,48 @@ export class OrderService {
                 return Object.values(orders)
             }
         }
+    
+    public viewOrder = async (userData : IjwtData, order_id : number) => {
+        const order = await this.orderRepo.findOrder("order_id", order_id )
+        if(!order){
+            const err = new APIError("order not found", 404)
+            err.name = "ORDER_NOT_FOUND"
+            throw err
+        }
+        let managedOrder : IsingleOrderCustomer = {
+            order_id : order.order_id,
+            address : order.address,
+            status : order.status,
+            payment_id : order.payment.payment_id,
+            total : 0,
+            items : []
+        }
+        let totalSum = 0 
+        for(let item of order.items){
+            let itemData = {
+                item_id : item.item_id,
+                sub_total : item.price * item.quantity,
+                product_id : item.product.product_id,
+                product_image : item.product.product_image,
+                product_name : item.product.product_name,
+                description : item.product.description
+            }
+            totalSum += itemData.sub_total
+            managedOrder.total = totalSum
+            managedOrder.items.push(itemData)
+        }
+    }
 
     public changeOrderState = async (userData : IjwtData) => {
-
+        
     }
 
     public deleteOrder = async (userData : IjwtData, order_id : number) => {
-        
+        const order = await this.orderRepo.findOrder("order_id", order_id)
+        if(!order){
+            const err =  new APIError("order was not found", 404)
+            err.name = "ORDER_NOT_FOUND"
+        }
+        await this.orderRepo.deleteOrder(order_id)
     }
 }
