@@ -18,6 +18,7 @@ export const makeOrder = async (req : Request, res : Response, next : NextFuncti
         return sendAPIResponse(res, "order made", 200, response)
     }
     catch(err){
+        console.log(err)
         next(err)
     }
 }
@@ -35,7 +36,8 @@ export const viewOrders = async (req : Request, res : Response, next : NextFunct
 
 export const viewOrder = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
-
+        const response = await orderService.viewOrder(req.user, +req.params.id)
+        return sendAPIResponse(res, "order", 200, response)
     }
     catch(err){
         next(err)
@@ -44,7 +46,8 @@ export const viewOrder = async (req : Request<Iparams>, res : Response, next : N
 
 export const changeOrderState = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
-
+        const response = await orderService.changeOrderState(req.user, +req.params.id, req.body)
+        return sendAPIResponse(res, "order", 200, response)
     }
     catch(err){
         next(err)
@@ -53,7 +56,8 @@ export const changeOrderState = async (req : Request<Iparams>, res : Response, n
 
 export const deleteOrder = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
-
+        await orderService.deleteOrder( req.user, +req.params.id)
+        return sendAPIResponse(res, "prder deleted", 200)
     }
     catch(err){
         next(err)
