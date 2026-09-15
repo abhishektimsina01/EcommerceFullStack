@@ -1,7 +1,7 @@
 import { HTTP_STATUS } from "../constant/http_status.constant"
 import { User } from "../database/Entity/user.entity"
 import { ORDER_STATUS, ROLES } from "../enum/enums"
-import { APIError, AuthenticationError } from "../exceptions/custom.exceptions"
+import { APIError, AuthenticationError, AuthotizationError } from "../exceptions/custom.exceptions"
 import { IjwtData, Iorder, IorderCustomer, IordersProvider, IsingleOrderCustomer } from "../interface/interfaces"
 import { AddressRepository } from "../repository/address.repository"
 import { ShopCartRepository } from "../repository/cart.repository"
@@ -14,6 +14,9 @@ import { ProviderRepository } from "../repository/provider.repository"
 import { Customer } from "../database/Entity/customer.entity"
 import { Provider } from "../database/Entity/provider.entity"
 import { redisClient } from "../config/redis.config"
+import { Or } from "typeorm"
+import { stat } from "node:fs"
+import { threadCpuUsage } from "node:process"
 
 
 export class OrderService {
@@ -198,8 +201,47 @@ export class OrderService {
         }
     }
 
-    public changeOrderState = async (userData : IjwtData) => {
-        
+    public changeOrderState = async (userData : IjwtData, order_id : number, state : ORDER_STATUS) => {
+        const order = await this.orderRepo.findOrder("order_id", order_id)
+        if(!order){
+            const err = new APIError("error", 404)
+            throw err
+        }
+        if(this.roleHelper.isCustomer(userData.role)){
+            if(order.status === ORDER_STATUS.PENDING && state === ORDER_STATUS.CANCELED){
+                order.status = ORDER_STATUS.CANCELED
+                await this.orderRepo.orderRepo.save(order)
+            }
+            else{
+                throw new AuthotizationError("NOT ALLOWED")
+            }
+        }
+        else{
+            if(state === ORDER_STATUS.CANCELED){
+                if(order.status === ORDER_STATUS.PENDING || order.status === ORDER_STATUS.PROCESSING){
+                    order.status = ORDER_STATUS.CANCELED
+                    await this.orderRepo.orderRepo.save(order)
+                }
+                else{
+                    throw new AuthotizationError("NOT ALLOWED")
+                }
+            }
+            else if(state === ORDER_STATUS.PROCESSING){
+                if(order.status === ORDER_STATUS.PENDING){
+                    order.status = ORDER_STATUS.PROCESSING
+                    await this.orderRepo.orderRepo.save(order)
+                }
+            }
+            else if(state === ORDER_STATUS.DELIVERED){
+                if(order.status === ORDER_STATUS.PROCESSING){
+                    order.status === ORDER_STATUS.PROCESSING
+                    await this.orderRepo.orderRepo.save(order)
+                }
+            }
+            else{
+                throw new AuthotizationError("NOT ALLOWED")
+            }
+        }
     }
 
     public deleteOrder = async (userData : IjwtData, order_id : number) => {
