@@ -12,7 +12,6 @@ export const authenticate = async (req : Request, res : Response, next : NextFun
     try{
         // try to access the token from the cookie
         const {access_token} = req.cookies
-        console.log(access_token)
         if(!access_token){
             throw new AuthenticationError("LOGIN", "no token found please login")
         }
@@ -33,14 +32,16 @@ export const authenticate = async (req : Request, res : Response, next : NextFun
     }
 }
 
-export const authorize = (...roles : ROLES[]) => {
+export const authorize = (...roles : any) => {
     return (req : Request, res : Response, next : NextFunction) => {
         try{
             if(roles.includes(req.user.role)){
                 next()
             }
-            const err = new AuthotizationError(`${req.user.role} not authorized`)
-            throw err
+            else{
+                const err = new AuthotizationError(`${req.user.role} not authorized`)
+                throw err
+            }
         }
         catch(err){ 
             next(err)

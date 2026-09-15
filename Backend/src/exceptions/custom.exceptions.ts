@@ -1,5 +1,6 @@
 import Joi from "joi"
 import { HTTP_STATUS } from "../constant/http_status.constant"
+import { QueryFailedError } from "typeorm"
 
 export class APIError extends Error{
     public statusCode : number
@@ -41,5 +42,14 @@ export class ValidationError extends APIError{
             cause : error.cause,
             message : error.details[0].message
         })
+    }
+}
+
+export class QueryError extends APIError{
+    constructor(err : QueryFailedError){
+        super("Failed to perform the operation", HTTP_STATUS.CLIENT_ERROR.BAD_REQUEST.CODE,{
+            ...err
+        })
+        this.name = err.name
     }
 }

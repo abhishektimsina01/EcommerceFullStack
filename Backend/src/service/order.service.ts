@@ -210,7 +210,7 @@ export class OrderService {
         if(this.roleHelper.isCustomer(userData.role)){
             if(order.status === ORDER_STATUS.PENDING && state === ORDER_STATUS.CANCELED){
                 order.status = ORDER_STATUS.CANCELED
-                await this.orderRepo.orderRepo.save(order)
+                return await this.orderRepo.orderRepo.save(order)
             }
             else{
                 throw new AuthotizationError("NOT ALLOWED")
@@ -220,7 +220,7 @@ export class OrderService {
             if(state === ORDER_STATUS.CANCELED){
                 if(order.status === ORDER_STATUS.PENDING || order.status === ORDER_STATUS.PROCESSING){
                     order.status = ORDER_STATUS.CANCELED
-                    await this.orderRepo.orderRepo.save(order)
+                    return await this.orderRepo.orderRepo.save(order)
                 }
                 else{
                     throw new AuthotizationError("NOT ALLOWED")
@@ -229,13 +229,13 @@ export class OrderService {
             else if(state === ORDER_STATUS.PROCESSING){
                 if(order.status === ORDER_STATUS.PENDING){
                     order.status = ORDER_STATUS.PROCESSING
-                    await this.orderRepo.orderRepo.save(order)
+                    return await this.orderRepo.orderRepo.save(order)
                 }
             }
             else if(state === ORDER_STATUS.DELIVERED){
                 if(order.status === ORDER_STATUS.PROCESSING){
                     order.status === ORDER_STATUS.PROCESSING
-                    await this.orderRepo.orderRepo.save(order)
+                    return await this.orderRepo.orderRepo.save(order)
                 }
             }
             else{

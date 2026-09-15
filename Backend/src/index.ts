@@ -4,12 +4,14 @@ import { connectDb } from "./database/connect.db"
 import { serverMiddleware } from "./middleware/server.middleware"
 import { serverRoute } from "./routes/server.route"
 import { getEnvProperty } from "./utils/getEnvPropery.utils"
+import { connectRedis } from "./config/redis.config"
 
 
 export const appConfiguration = async () => {
     try{
         const app : Express = express()
         await connectDb()
+        await connectRedis()
         serverMiddleware(app)
         serverRoute(app)
         app.listen(getEnvProperty("port"), (err) => {

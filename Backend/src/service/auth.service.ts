@@ -1,6 +1,7 @@
 import { ROLES } from "../enum/enums";
 import { AuthenticationError } from "../exceptions/custom.exceptions";
 import { IjwtData, ILogIn, IproductItem, IproviderSignUp } from "../interface/interfaces";
+import { consoleQueue } from "../queue/queue";
 import { AddressRepository } from "../repository/address.repository";
 import { CustomerRepository } from "../repository/customer.repository";
 import { ProviderRepository } from "../repository/provider.repository";
@@ -40,6 +41,7 @@ export class AuthService {
             role : user.role
         }
         const {access_token, refresh_token} = signToken(data)
+        await consoleQueue.add("console", data)
         return {
             ...data,
             access_token, 
@@ -69,7 +71,6 @@ export class AuthService {
             }
         }
         const user = await this.userRepo.createUser(userPayoad)
-        console.log(user)
         const {access_token, refresh_token} = signToken({
             id : user.user_id,
             username : user.username,

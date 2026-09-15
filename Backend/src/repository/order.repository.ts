@@ -2,15 +2,54 @@ import { In, Repository } from "typeorm";
 import { Order } from "../database/Entity/order.entity";
 import { OrderItem } from "../database/Entity/order_item.entity";
 import { appDataSource } from "../database/connect.db";
+import { string } from "joi";
+import { ROLES } from "../enum/enums";
 
 
 export class OrderRepository {
 
-    private orderRepo : Repository<Order>
+    orderRepo : Repository<Order>
     private orderItemRepo : Repository<OrderItem>
     constructor(){
         this.orderItemRepo = appDataSource.getRepository(OrderItem)
         this.orderRepo = appDataSource.getRepository(Order)
+    }
+
+    public findOrder = async <T>(key : string, value : T) => {
+        return await this.orderRepo.findOne({
+            where : {
+                [`${key}`] : value
+            },
+            select : {
+                order_id : true,
+                items : {
+                    item_id : true,
+                    product : {
+                        product_id : true,
+                        product_name : true,
+                        product_image : true,
+                    },
+                    price : true,
+                    quantity : true,
+                },
+                payment : {
+                    payment_id : true,
+                },
+                status : true,
+                address : {
+                    address_id: true,
+                    state : true,
+                    city : true
+                }
+            },
+            relations : {
+                items : {
+                    product : true
+                },
+                payment : true,
+                address : true
+            }
+        })
     }
 
     public createOrder = async (customer_id : number, address_id : number) => {

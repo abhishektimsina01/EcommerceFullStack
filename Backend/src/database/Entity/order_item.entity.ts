@@ -8,7 +8,7 @@ export class OrderItem {
     @PrimaryGeneratedColumn({type : "int"})
     item_id !: number
 
-    @OneToOne(() => Product, {onDelete : "CASCADE"})
+    @ManyToOne(() => Product, {onDelete : "CASCADE"})
     @JoinColumn({name : "product_item_id"})
     product !: Product
 

@@ -135,3 +135,23 @@ export interface IorderCustomer {
     }[],
     payment_id : number | null
 }
+
+export interface IsingleOrderCustomer {
+    order_id : number
+    address : {
+        address_id : number
+        state : string
+        city : string
+    }
+    status : ORDER_STATUS
+    payment_id : number
+    total : number
+    items : {
+        item_id : number
+        sub_total : number
+        product_id : number
+        product_name : string
+        product_image : string
+        description : string    
+    }[]
+}
