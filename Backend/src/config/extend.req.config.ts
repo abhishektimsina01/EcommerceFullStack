@@ -1,4 +1,3 @@
-import { Request } from "express"
 import { ROLES } from "../enum/enums"
 
 declare global {
