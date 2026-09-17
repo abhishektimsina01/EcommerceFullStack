@@ -1,20 +1,85 @@
 import { In, Repository } from "typeorm";
 import { Order } from "../database/Entity/order.entity";
-import { OrderItem } from "../database/Entity/order_item.entity";
 import { appDataSource } from "../database/connect.db";
-import { string } from "joi";
-import { ROLES } from "../enum/enums";
 
 
 export class OrderRepository {
 
     orderRepo : Repository<Order>
-    private orderItemRepo : Repository<OrderItem>
+
     constructor(){
-        this.orderItemRepo = appDataSource.getRepository(OrderItem)
         this.orderRepo = appDataSource.getRepository(Order)
     }
 
+    public findAllOrder = async ()=> {
+        return await this.orderRepo.find({
+            where : {},
+            select : {
+                order_id : true,
+                price : true,
+                quantity : true,
+                payment : {
+                    payment_id : true,
+                },
+                product : {
+                    product_id : true,
+                    product_image : true,
+                    product_name : true,
+                    product_type : true
+                },
+                status : true
+            },
+            relations : {
+                payment : true,
+                product : true
+            }
+        },)
+    }
+
+    public findOrderAdmin = async <T>(key : string, value : T) => {
+        return await this.orderRepo.findOne({
+            where : {
+                [`${key}`] : value
+            },
+            select : {
+                order_id : true,
+                product : {
+                    product_id : true,
+                    product_name : true,
+                    product_image : true,
+                },
+                price : true,
+                quantity : true,
+                payment : {
+                    payment_id : true,
+                },
+                status : true,
+                address : {
+                    address_id: true,
+                    state : true,
+                    city : true
+                },
+                customer : {
+                    customer_id : true,
+                    user : {
+                        user_id : true,
+                        username : true,
+                        phone_number : true,
+                        email : true,
+                    }
+                }
+            },
+            relations : {
+                product : true,
+                payment : true,
+                address : true,
+                customer : {
+                    user : true
+                }
+            }
+        })
+    }
+    
     public findOrder = async <T>(key : string, value : T) => {
         return await this.orderRepo.findOne({
             where : {
@@ -22,16 +87,13 @@ export class OrderRepository {
             },
             select : {
                 order_id : true,
-                items : {
-                    item_id : true,
-                    product : {
-                        product_id : true,
-                        product_name : true,
-                        product_image : true,
-                    },
-                    price : true,
-                    quantity : true,
+                product : {
+                    product_id : true,
+                    product_name : true,
+                    product_image : true,
                 },
+                price : true,
+                quantity : true,
                 payment : {
                     payment_id : true,
                 },
@@ -43,43 +105,26 @@ export class OrderRepository {
                 }
             },
             relations : {
-                items : {
-                    product : true
-                },
+                product : true,
                 payment : true,
                 address : true
             }
         })
     }
 
-    public createOrder = async (customer_id : number, address_id : number) => {
+    public createOrder = async (customer_id : number, address_id : number, product_id : number) => {
         const order = this.orderRepo.create({
             customer : {
                 customer_id : customer_id
             },
             address : {
                 address_id : address_id
+            },
+            product : {
+                product_id : product_id
             }
         })
         return await this.orderRepo.save(order)
-    }
-
-    public addOrderItems = async (productData : {
-        product_id : number
-        quantity : number
-        price : number
-    }, orderId : number) => {
-        const item = this.orderItemRepo.create({
-            order : {
-                order_id : orderId, 
-            },
-            price : productData.price,
-            quantity : productData.quantity,
-            product : {
-                product_id : productData.product_id
-            }
-        })
-        return this.orderItemRepo.save(item)
     }
 
     // for the customer
@@ -93,82 +138,21 @@ export class OrderRepository {
             select : {
                 order_id : true,
                 status : true,
-                items : {
-                    item_id : true,
-                    price : true,
-                    quantity : true,
-                    product : {
-                        product_id : true,
-                        product_name : true,
-                        product_image : true,
-                        description : true,
-                        provider : {
-                            provider_id : true,
-                            user : {
-                                user_id : true,
-                                username : true
-                            }
-                        }
-                    }
+                quantity : true,
+                price : true,
+                product : {
+                    product_id : true,
+                    product_name : true,
+                    product_image : true,
+                    description : true,
                 },
                 payment : {
                     payment_id : true
                 }
             },
             relations : {
-                items : {
-                    product : {
-                        provider : {
-                            user : true
-                        }
-                    }
-                },
-                payment : true
-            }
-        })
-    }
-
-    // for the producer
-    public getOrderItem = async (product_ids : number[]) => {
-        return await this.orderItemRepo.find({
-            where : {
-                product : {
-                    product_id : In([...product_ids])
-                }
-            },
-            select : {
-                item_id : true,
-                price : true,
-                quantity : true,
-                product : {
-                    product_id : true, 
-                    product_image : true,
-                    description : true,
-                    product_name : true,
-                },
-                order : {
-                    order_id : true,
-                    status : true,
-                    customer : {
-                        customer_id : true,
-                        user : {
-                            user_id : true,
-                            username : true, 
-                        }
-                    },
-                    payment : {
-                        payment_id : true
-                    }
-                }
-            },
-            relations : {
                 product : true,
-                order : {
-                    customer : {
-                        user : true
-                    },
-                    payment : true
-                }
+                payment : true
             }
         })
     }
@@ -177,9 +161,5 @@ export class OrderRepository {
         return await this.orderRepo.delete({
             order_id : orderId
         })
-    }
-
-    public editOrder = async () => {
-
     }
 }

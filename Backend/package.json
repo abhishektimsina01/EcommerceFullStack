@@ -8,6 +8,7 @@
     "build": "tsc --build",
     "dev": "tsx watch src/server.ts",
     "local": "node dist/server.js",
+    "worker": "tsx watch src/workers/workers.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,6 +25,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
     "http-status-codes": "^2.3.0",
+    "ioredis": "^5.11.1",
     "joi": "^18.2.8",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.12.0",

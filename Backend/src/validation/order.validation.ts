@@ -7,7 +7,7 @@ const productItem = Joi.object({
 })
 
 export const orderSchema = Joi.object({
-    product : Joi.array().items(productItem).unique().min(1).required(),
+    product : productItem.required(),
     current_address : Joi.object({
         address : addressSchema.optional(),
         default_address : Joi.bool().optional()

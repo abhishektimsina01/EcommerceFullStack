@@ -76,14 +76,14 @@ export class ShopCartRepository {
         return await this.shopCartItemRepo.save(new_item)
     }
 
-    public deleteCartItem = async (cart_id : number , product_id : number[]) => {
+    public deleteCartItem = async (cart_id : number , product_id : number) => {
         const cartItem = await this.shopCartItemRepo.find({
             where : {
                 cart : {
                     cart_id : cart_id
                 },
                 product_item : {
-                    product_id : In([...product_id])
+                    product_id : product_id
                 }
             }
         })

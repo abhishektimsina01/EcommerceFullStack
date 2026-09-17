@@ -53,12 +53,9 @@ export interface IproviderSignUp {
     email : string
     password : string
     username : string
-    store_name : string
     role : ROLES
     phone_number : number
     address : Iaddress
-    opening_time : string
-    closing_time : string
 }
 
 export interface Iparams {
@@ -85,7 +82,7 @@ export interface Iorder {
     product : {
         product_id : number
         quantity : number
-    }[]
+    }
     current_address : {
         address ?: Iaddress
         default_address ?: boolean
@@ -110,29 +107,20 @@ export interface IordersProvider {
         username : string
     },
     payment_id : number | null
-    product : Iproduct[]
+    product : Iproduct
 }
 
 export interface IorderCustomer {
     order_id : number
     status : ORDER_STATUS
-    items : {
-        item_id : number,
-        price : number,
-        quantity : number,
-        product : {
-            product_id : number,
-            product_name : string,
-            product_image : string,
-            description : string,
-            provider : {
-                provider_id : number,
-                user : {
-                    username : string
-                }
-            }
-        }
-    }[],
+    price : number
+    quantity : number
+    product : {
+        product_id : number,
+        product_name : string,
+        product_image : string,
+        description : string,
+    }
     payment_id : number | null
 }
 
@@ -146,12 +134,10 @@ export interface IsingleOrderCustomer {
     status : ORDER_STATUS
     payment_id : number
     total : number
-    items : {
-        item_id : number
-        sub_total : number
+    products : {
         product_id : number
         product_name : string
         product_image : string
         description : string    
-    }[]
+    }
 }

@@ -31,8 +31,8 @@ export const authLogIn = async(req : Request, res : Response, next : NextFunctio
 
 export const authSignUp = async (req : Request, res : Response, next : NextFunction) => {
     try{
-        const role = req.body.role
-        const {error} = SignupSchema[role as Exclude<ROLES, ROLES.ADMIN>].validate(req.body)
+        const role = req.body.role as ROLES
+        const {error} = SignupSchema[role as ROLES].validate(req.body)
         if(error){
             throw new ValidationError(error)
         }

@@ -3,11 +3,11 @@ import { AuthenticationError } from "../exceptions/custom.exceptions";
 import { IjwtData, ILogIn, IproductItem, IproviderSignUp } from "../interface/interfaces";
 import { consoleQueue } from "../queue/queue";
 import { AddressRepository } from "../repository/address.repository";
+import { AdminRepository } from "../repository/admin.repository";
 import { CustomerRepository } from "../repository/customer.repository";
 import { ProviderRepository } from "../repository/provider.repository";
 import { UserRepository } from "../repository/user.repository";
 import { providerType, signUpType } from "../types/types";
-import { extractKeysFromObj } from "../utils/checkKeyAndRetrieveValue";
 import { signToken } from "../utils/jwt.utils";
 import { comparePassword, hashPassword } from "../utils/password.utils";
 
@@ -17,12 +17,14 @@ export class AuthService {
     private addressRepo : AddressRepository
     private customerRepo : CustomerRepository
     private providerRepo : ProviderRepository
+    private adminRepo : AdminRepository
 
     constructor(){
         this.userRepo = new UserRepository()
         this.addressRepo = new AddressRepository()
         this.customerRepo = new CustomerRepository()
         this.providerRepo = new ProviderRepository()
+        this.adminRepo = new AdminRepository()
     }
 
     public loginService = async (userData : ILogIn) => { 
@@ -70,12 +72,15 @@ export class AuthService {
                 address_id : address_id
             }
         }
+        // user making
         const user = await this.userRepo.createUser(userPayoad)
         const {access_token, refresh_token} = signToken({
             id : user.user_id,
             username : user.username,
             role : user.role
         })
+        
+        // consumer
         if(user.role == ROLES.CUSTOMER){
             const customer = await this.customerRepo.createCustomer(user.user_id)
             safeData =  {
@@ -84,14 +89,13 @@ export class AuthService {
                 customer_id : customer.customer_id
             }
         }
+        // admin
         else{
-            const createPayload = extractKeysFromObj(userData, ["store_name", "opening_time", "closing_time"])
-            const provider = await this.providerRepo.createProvider({...(createPayload as providerType)}, user.user_id)
+            const admin = await this.adminRepo.createAdmin(user.user_id)
             safeData =  {
                 user_id : user.user_id,
                 username : user.username,
-                store_name : createPayload.store_name,
-                provider_id : provider.provider_id
+                admin_id : admin.admin_id
             }
         }
         return {

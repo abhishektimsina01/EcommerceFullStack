@@ -1,7 +1,6 @@
 import { Repository } from "typeorm";
 import { appDataSource } from "../database/connect.db";
 import { providerType } from "../types/types";
-import { Provider } from "../database/Entity/provider.entity";
 
 
 export class ProviderRepository {

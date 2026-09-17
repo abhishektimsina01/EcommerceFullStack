@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Customer } from "./customer.entity";
-import { OrderItem } from "./order_item.entity";
 import { ORDER_STATUS } from "../../enum/enums";
 import { Payment } from "./payment.entity";
 import { Address } from "./address.entity";
+import { Product } from "./product.entity";
 
 @Entity()
 export class Order {
@@ -18,8 +18,11 @@ export class Order {
     @JoinColumn({name : "customer_id"})
     customer !: Customer
 
-    @Column({type : "varchar", nullable : true})
-    session_id !: string
+    @Column({type : "int", scale : 2})
+    price !: number
+
+    @Column({type : "int"})
+    quantity !: number
 
     @OneToOne(() => Address, {onDelete : "CASCADE"})
     @JoinColumn({name : "address_id"})
@@ -28,8 +31,9 @@ export class Order {
     @OneToOne(() => Payment, (payment) => payment.order, {nullable : true})
     @JoinColumn({name : "payment_id"})
     payment !: Payment
-    
-    @OneToMany(() => OrderItem, (item) => item.order)
-    items !: OrderItem[]
+
+    @ManyToOne(() => Product, {onDelete : "CASCADE"})
+    @JoinColumn({name : "product_id"})
+    product !: Product
 
 }

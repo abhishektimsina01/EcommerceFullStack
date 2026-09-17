@@ -1,7 +1,7 @@
 import { ROLES } from "../enum/enums";
-import { signUpCustomerSchema, signUpProviderScehma } from "../validation/auth.validation";
+import { signUpAdminScehma, signUpCustomerSchema } from "../validation/auth.validation";
 
 export const SignupSchema = {
     [ROLES.CUSTOMER] : signUpCustomerSchema,
-    [ROLES.PROVIDER] : signUpProviderScehma
+    [ROLES.ADMIN] : signUpAdminScehma
 }

@@ -1,7 +1,6 @@
 export enum ROLES {
     CUSTOMER = "customer",
-    ADMIN = "admin",
-    PROVIDER = "provider"
+    ADMIN = "admin"
 }
 
 export enum ORDER_STATUS {

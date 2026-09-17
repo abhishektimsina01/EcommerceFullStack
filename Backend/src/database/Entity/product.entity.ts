@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ITEM_CATEGORY } from "../../enum/enums";
-import { Provider } from "./provider.entity";
 
 @Entity()
 export class Product {
@@ -25,9 +24,5 @@ export class Product {
     
     @Column({type : "int"})
     stock !: number
-    
-    @ManyToOne(() => Provider, (provider) => provider.products, {onDelete : "CASCADE"})
-    @JoinColumn({name : "provider_id"})
-    provider !: Provider
 
 }

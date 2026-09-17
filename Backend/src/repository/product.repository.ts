@@ -3,7 +3,6 @@ import { Product } from "../database/Entity/product.entity";
 import { appDataSource } from "../database/connect.db";
 import { Ifilters, IjwtData, IproductItem } from "../interface/interfaces";
 import { ROLES } from "../enum/enums";
-import { ResturantProjection } from "../constant/project.constant";
 
 
 export class ProductRepository {
@@ -27,35 +26,23 @@ export class ProductRepository {
             where : {
                 [`${key}`] : value
             },
-            ...ResturantProjection[role as Exclude<ROLES, ROLES.ADMIN>]
+            select : {
+                product_id : true,
+                price : true,
+                stock : true,
+                product_image : true,
+                product_name : true,
+                product_type : true,
+                description : true
+            },
         })
     }
 
-    public createProduct = async (provider_id : number, productData : IproductItem) => {
+    public createProduct = async (productData : IproductItem) => {
         const product = this.productRepo.create({
             ...productData,
-            provider : {
-                provider_id : provider_id
-            }
         })
         return await this.productRepo.save(product)
-    }
-
-    public findAllProductsProvider = async (provider_id : number) => {
-            return this.productRepo.find({
-                where : {
-                    provider : {
-                        provider_id : provider_id
-                    }
-                },
-                select : {
-                    product_id : true,
-                    product_name : true,
-                    price : true,
-                    product_image : true,
-                    product_type : true
-                }
-            })
     }
 
     public findAllProducts = async (userData : IjwtData, where : any = {}) => {
@@ -93,7 +80,7 @@ export class ProductRepository {
         },{
             ...productData
         })
-        const product = await this.findProductItem("product_id", productId, ROLES.PROVIDER)
+        const product = await this.findProductItem("product_id", productId, ROLES.ADMIN)
         return product as Product
     }
 }

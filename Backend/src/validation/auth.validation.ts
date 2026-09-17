@@ -24,14 +24,14 @@ export const signUpCustomerSchema = Joi.object({
     role : Joi.string().valid(...Object.values(ROLES)).required(),
 })
 
-export const signUpProviderScehma = Joi.object({
+export const signUpAdminScehma = Joi.object({
     email : Joi.string().email().required(),
     password : Joi.string().min(6).max(18).required(),
     username : Joi.string().required(),
-    store_name : Joi.string().required(),
+    // store_name : Joi.string().required(),
     phone_number: Joi.string().pattern(/^(97|98)\d{8}$/).required(),
-    opening_time: Joi.string().pattern(/^(?:[01]\d|2[0-3]):[0-5]\d$/).required(),
-    closing_time: Joi.string().pattern(/^(?:[01]\d|2[0-3]):[0-5]\d$/).required(),
+    // opening_time: Joi.string().pattern(/^(?:[01]\d|2[0-3]):[0-5]\d$/).required(),
+    // closing_time: Joi.string().pattern(/^(?:[01]\d|2[0-3]):[0-5]\d$/).required(),
     role : Joi.string().valid(...Object.values(ROLES)).required(),
     address : addressSchema.required()
 })
