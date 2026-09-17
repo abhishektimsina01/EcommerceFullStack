@@ -8,8 +8,4 @@ export class RoleHelper {
     public isCustomer = (role:ROLES) => {
         return (role === ROLES.CUSTOMER) ? true : false
     }
-
-    public isProvider = (role : ROLES) => {
-        return (role === ROLES.PROVIDER) ? true : false
-    }
 }

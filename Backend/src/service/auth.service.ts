@@ -5,7 +5,6 @@ import { consoleQueue } from "../queue/queue";
 import { AddressRepository } from "../repository/address.repository";
 import { AdminRepository } from "../repository/admin.repository";
 import { CustomerRepository } from "../repository/customer.repository";
-import { ProviderRepository } from "../repository/provider.repository";
 import { UserRepository } from "../repository/user.repository";
 import { providerType, signUpType } from "../types/types";
 import { signToken } from "../utils/jwt.utils";
@@ -16,14 +15,12 @@ export class AuthService {
     private userRepo : UserRepository
     private addressRepo : AddressRepository
     private customerRepo : CustomerRepository
-    private providerRepo : ProviderRepository
     private adminRepo : AdminRepository
 
     constructor(){
         this.userRepo = new UserRepository()
         this.addressRepo = new AddressRepository()
         this.customerRepo = new CustomerRepository()
-        this.providerRepo = new ProviderRepository()
         this.adminRepo = new AdminRepository()
     }
 

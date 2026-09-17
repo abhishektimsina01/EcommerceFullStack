@@ -32,7 +32,7 @@ export const deleteCartItem = async (req : Request, res : Response, next : NextF
         // can be single or all
         const itemIds = req.body?.itemIds
         if(Array.isArray(itemIds) && itemIds.length != 0 ){
-            await shopCartservice.deleteCartItem(req.user, itemIds as number[])
+            await shopCartservice.deleteCartItem(req.user, +itemIds)
         }
         else{
             const err = new APIError("send ids of the items to be removed", 200)

@@ -10,7 +10,6 @@ import { OrderRepository } from "../repository/order.repository"
 import { ProductRepository } from "../repository/product.repository"
 import { UserRepository } from "../repository/user.repository"
 import { RoleHelper } from "../helper/role.helper"
-import { ProviderRepository } from "../repository/provider.repository"
 import { Customer } from "../database/Entity/customer.entity"
 import { redisClient } from "../config/redis.config"
 import { Order } from "../database/Entity/order.entity"
@@ -21,7 +20,6 @@ export class OrderService {
     private userRepo : UserRepository
     private orderRepo : OrderRepository
     private customerRepo : CustomerRepository
-    private providerRepo : ProviderRepository
     private shopCartRepo : ShopCartRepository
     private productRepo : ProductRepository
     private addressRepo : AddressRepository
@@ -34,7 +32,6 @@ export class OrderService {
         this.productRepo = new ProductRepository()
         this.addressRepo = new AddressRepository()
         this.userRepo = new UserRepository()
-        this.providerRepo = new ProviderRepository()
         this.roleHelper = new RoleHelper()
     }
 

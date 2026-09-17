@@ -73,7 +73,7 @@ export class ShopCartService {
         return addedItem
     }
 
-    public deleteCartItem = async (userData : IjwtData, itemId : number[]) => {
+    public deleteCartItem = async (userData : IjwtData, itemId : number) => {
         const customer = await this.customerRepo.findCustomer("user", {
             user_id : userData.id
         })

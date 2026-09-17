@@ -4,15 +4,13 @@ import { APIError } from "../exceptions/custom.exceptions";
 import { RoleHelper } from "../helper/role.helper";
 import { Ifilters, IjwtData, IproductItem } from "../interface/interfaces";
 import { ProductRepository } from "../repository/product.repository";
-import { ProviderRepository } from "../repository/provider.repository";
 import { extractKeysFromObj } from "../utils/checkKeyAndRetrieveValue";
 import { uploader } from "../utils/cloudinary.utils";
-import { UploadApiResponse } from "cloudinary";
+import { UploadApiResponse } from "cloudinary";``
 import { AdminRepository } from "../repository/admin.repository";
 
 
 export class ProductService {
-    private providerRepo : ProviderRepository
     private productRepo : ProductRepository
     private adminRepo : AdminRepository
     private roleHelper : RoleHelper
@@ -20,7 +18,6 @@ export class ProductService {
     constructor(){
         this.productRepo = new ProductRepository()
         this.roleHelper = new RoleHelper()
-        this.providerRepo = new ProviderRepository()
         this.adminRepo = new AdminRepository()
     }
 
