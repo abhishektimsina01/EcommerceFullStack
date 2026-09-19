@@ -71,7 +71,7 @@ export class OrderService {
         }
 
         // create order
-        const order = await this.orderRepo.createOrder(customer.customer_id, address_id, products.product_id)
+        const order = await this.orderRepo.createOrder(customer.customer_id, address_id, products.product_id, fetched_product.price, products.quantity)
         await this.productRepo.updateProduct(products.product_id, {
             stock : fetched_product.stock - products.quantity
         })

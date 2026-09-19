@@ -32,7 +32,7 @@ export const deleteCartItem = async (req : Request, res : Response, next : NextF
         // can be single or all
         const itemIds = req.body?.itemIds
         if(Array.isArray(itemIds) && itemIds.length != 0 ){
-            await shopCartservice.deleteCartItem(req.user, +itemIds)
+            await shopCartservice.deleteCartItem(req.user, Number(itemIds[0]))
         }
         else{
             const err = new APIError("send ids of the items to be removed", 200)
@@ -49,8 +49,8 @@ export const deleteCartItem = async (req : Request, res : Response, next : NextF
 export const editItemInCart = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
         const qty = req.body?.quantity ?? null
-        if(qty){
-            const err = new APIError("send qty of the items to be removed", 200)
+        if(qty == null){
+            const err = new APIError("send qty of the items to be updated", 200)
             err.name = "ValidationError"
             throw err
         }

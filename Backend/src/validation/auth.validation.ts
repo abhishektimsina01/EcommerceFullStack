@@ -10,8 +10,6 @@ export const addressSchema = Joi.object({
     city : Joi.string().required(),
     state : Joi.string().required(),
     postal_code : Joi.string().optional(),
-    longitude : Joi.number().required(),
-    latitude : Joi.number().required(),
     address_line : Joi.string().optional()
 })
 

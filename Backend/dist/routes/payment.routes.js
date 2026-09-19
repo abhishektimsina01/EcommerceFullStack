@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.paymentRouter = void 0;
+const express_1 = require("express");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const enums_1 = require("../enum/enums");
+const payment_controller_1 = require("../controller/payment.controller");
+exports.paymentRouter = (0, express_1.Router)();
+exports.paymentRouter.post("/payments/esewa/initiate", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.CUSTOMER), payment_controller_1.initiateEsewaPayment);
+exports.paymentRouter.get("/payments/esewa/success", payment_controller_1.completeEsewaPayment);
+exports.paymentRouter.get("/payments/esewa/failure", payment_controller_1.failEsewaPayment);

@@ -13,6 +13,7 @@ export const appConfiguration = async () => {
         await connectDb()
         await connectRedis()
         serverMiddleware(app)
+        app.use("/uploads", express.static("uploads"))
         serverRoute(app)
         app.listen(getEnvProperty("port"), (err) => {
             if(err){

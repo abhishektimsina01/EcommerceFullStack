@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.productRouter = void 0;
+const express_1 = require("express");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const enums_1 = require("../enum/enums");
+const products_controller_1 = require("../controller/products.controller");
+const multer_config_1 = require("../config/multer.config");
+exports.productRouter = (0, express_1.Router)();
+exports.productRouter.post("/products", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.ADMIN), multer_config_1.upload.single("image"), products_controller_1.createProduct);
+exports.productRouter.get("/products", products_controller_1.getProducts);
+exports.productRouter.get("/product/:id", products_controller_1.getProduct);
+exports.productRouter.patch("/product/:id", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.ADMIN), products_controller_1.updateProduct);
+exports.productRouter.delete("/product/:id", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.ADMIN), products_controller_1.deleteProduct);

@@ -36,8 +36,6 @@ export interface Iaddress {
     state : string
     postal_code ?: string
     address_line ?: string
-    longitude : number
-    latitude : number
 }
 
 export interface IcustomerSignUp {

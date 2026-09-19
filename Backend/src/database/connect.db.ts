@@ -18,7 +18,7 @@ export const appDataSource : DataSource = new DataSource({
     username : getEnvProperty("db_username"),
     password : getEnvProperty("db_password"),
     entities : [User, Customer, Admin, Address, Product, ShopCart, ShopCartItem, Order, Payment],
-    synchronize : true
+    synchronize : false
 })
 
 export const connectDb = async () => {

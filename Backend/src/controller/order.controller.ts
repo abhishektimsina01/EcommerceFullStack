@@ -46,7 +46,7 @@ export const viewOrder = async (req : Request<Iparams>, res : Response, next : N
 
 export const changeOrderState = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
-        const response = await orderService.changeOrderState(req.user, +req.params.id, req.body)
+        const response = await orderService.changeOrderState(req.user, +req.params.id, req.body?.status ?? req.body)
         return sendAPIResponse(res, "order", 200, response)
     }
     catch(err){

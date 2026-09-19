@@ -43,7 +43,8 @@ export const getProducts = async (req : Request, res : Response, next : NextFunc
 
 export const getProduct = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
-        const response = await productService.getProductService(req.user, +req.params.id)
+        const user = req.user ?? { id: 0, username: "guest", role: ROLES.CUSTOMER }
+        const response = await productService.getProductService(user, +req.params.id)
         return sendAPIResponse(res, "product fetched", 200, {
             ...response
         })

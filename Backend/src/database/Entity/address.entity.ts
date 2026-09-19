@@ -1,6 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./user.entity";
-
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Address {
@@ -19,12 +17,6 @@ export class Address {
 
     @Column({type : "varchar", nullable : true})
     postal_code !: string | null
-
-    @Column({type : "decimal"})
-    longitude !: number
-
-    @Column({type : "decimal"})
-    latitude !: number
 
     @CreateDateColumn()
     created_at !: Date

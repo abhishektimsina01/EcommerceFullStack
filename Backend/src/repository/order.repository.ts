@@ -112,7 +112,7 @@ export class OrderRepository {
         })
     }
 
-    public createOrder = async (customer_id : number, address_id : number, product_id : number) => {
+    public createOrder = async (customer_id : number, address_id : number, product_id : number, price : number, quantity : number) => {
         const order = this.orderRepo.create({
             customer : {
                 customer_id : customer_id
@@ -122,7 +122,9 @@ export class OrderRepository {
             },
             product : {
                 product_id : product_id
-            }
+            },
+            price,
+            quantity
         })
         return await this.orderRepo.save(order)
     }

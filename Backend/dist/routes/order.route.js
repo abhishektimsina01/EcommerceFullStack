@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.orderRouter = void 0;
+const express_1 = require("express");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const enums_1 = require("../enum/enums");
+const order_controller_1 = require("../controller/order.controller");
+exports.orderRouter = (0, express_1.Router)();
+exports.orderRouter.post("/orders", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.CUSTOMER), order_controller_1.makeOrder);
+exports.orderRouter.get("/orders", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.CUSTOMER, enums_1.ROLES.ADMIN), order_controller_1.viewOrders);
+exports.orderRouter.get("/orders/:id", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.CUSTOMER, enums_1.ROLES.ADMIN), order_controller_1.viewOrder);
+exports.orderRouter.delete("/orders/:id", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.CUSTOMER, enums_1.ROLES.ADMIN), order_controller_1.deleteOrder);
+exports.orderRouter.patch("/orders/:id", auth_middleware_1.authenticate, (0, auth_middleware_1.authorize)(enums_1.ROLES.ADMIN), order_controller_1.changeOrderState);
