@@ -30,6 +30,10 @@ export function getRecommendedProducts(filters: ProductFilters = {}) {
   return apiRequest<Product[]>(`/api/products/recommended${query ? `?${query}` : ''}`)
 }
 
+export function getCustomerRecommendations() {
+  return apiRequest<Product[]>('/api/products/recommendations')
+}
+
 export function getProduct(id: number) {
   return apiRequest<Product>(`/api/product/${id}`)
 }

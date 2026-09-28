@@ -191,6 +191,17 @@ export class OrderRepository {
             .filter((category) : category is ITEM_CATEGORY => Boolean(category))
     }
 
+    public getCustomerProductHistory = async (customer_id : number) => {
+        return await this.orderRepo.find({
+            where : { customer : { customer_id } },
+            select : {
+                order_id : true,
+                product : { product_id : true, product_type : true }
+            },
+            relations : { product : true }
+        })
+    }
+
     public markOrderPaid = async (orderId : number, payment : Payment) => {
         await this.orderRepo.update({ order_id : orderId }, { status : ORDER_STATUS.CONFIRMED })
         await this.orderRepo

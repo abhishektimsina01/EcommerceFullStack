@@ -8,7 +8,7 @@ import cors from "cors"
 
 export const serverMiddleware = (app : Application) => {
     app.use(morgan("dev"))
-    app.use(limiter)
+    // app.use(limiter)
     app.use(cors({ origin : true, credentials : true }))
     app.use(express.json())
     app.use(express.urlencoded({extended : true}))

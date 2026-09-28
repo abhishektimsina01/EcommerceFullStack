@@ -14,6 +14,16 @@ import { ShopCartRepository } from "../repository/cart.repository";
 import { appDataSource } from "../database/connect.db";
 import { Product } from "../database/Entity/product.entity";
 
+function shuffleProducts<T>(products: T[]) : T[] {
+    const shuffled = [...products]
+    for(let index = shuffled.length - 1; index > 0; index--){
+        const randomIndex = Math.floor(Math.random() * (index + 1))
+        const current = shuffled[index]
+        shuffled[index] = shuffled[randomIndex]
+        shuffled[randomIndex] = current
+    }
+    return shuffled
+}
 
 export class ProductService {
     private productRepo : ProductRepository
@@ -126,6 +136,45 @@ export class ProductService {
                 return a.index - b.index
             })
             .map((entry) => entry.product)
+    }
+
+    public getCustomerRecommendations = async (userData : IjwtData) => {
+        const products = await this.getAllProducts(userData, {})
+        const customer = await this.customerRepo.findCustomer("user", { user_id : userData.id })
+        if(!customer){
+            return shuffleProducts(products).slice(0, 12)
+        }
+
+        const history = await this.orderRepo.getCustomerProductHistory(customer.customer_id)
+        if(history.length === 0){
+            return shuffleProducts(products).slice(0, 12)
+        }
+
+        const purchasedIds = new Set(history
+            .map((order) => order.product?.product_id)
+            .filter((id): id is number => id !== undefined))
+        const categoryCounts = new Map<ITEM_CATEGORY, number>()
+        for(const order of history){
+            const category = order.product?.product_type
+            if(category){
+                categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1)
+            }
+        }
+
+        const unpurchased = products.filter((product) => !purchasedIds.has(product.product_id))
+        // Prefer alternatives from categories the customer has bought from. If those
+        // are exhausted, show other unseen products before falling back to purchases.
+        const relevant = unpurchased.filter((product) => categoryCounts.has(product.product_type))
+        const candidates = relevant.length > 0 ? relevant : unpurchased.length > 0 ? unpurchased : products
+        return candidates
+            .map((product, index) => ({ product, index }))
+            .sort((a, b) => {
+                const scoreA = categoryCounts.get(a.product.product_type) ?? 0
+                const scoreB = categoryCounts.get(b.product.product_type) ?? 0
+                return scoreB - scoreA || a.index - b.index
+            })
+            .slice(0, 12)
+            .map(({ product }) => product)
     }
 
     public deleteProduct = async (userData : IjwtData, productId : number) => {

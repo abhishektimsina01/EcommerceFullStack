@@ -94,6 +94,38 @@ h3,
   gap: 0.5rem;
 }
 
+/* Scroll the dashboard as one page while keeping its navigation and filters visible. */
+.home-scroll-layout {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.home-scroll-layout .store-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.home-scroll-layout .category-row {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  background: #fff;
+  padding: 0.35rem 0;
+}
+
+.home-scroll-layout .home-page {
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
+}
+
+.home-page .product-grid {
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -394,6 +426,66 @@ h3,
   gap: 1rem;
   align-content: start;
   padding: 0.25rem 0.4rem 0.85rem 0;
+}
+
+.recommendation-section {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 0.15rem 0 0.25rem;
+}
+
+.recommendation-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.recommendation-heading h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.recommendation-heading p {
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
+}
+
+.recommendation-controls {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.recommendation-arrow {
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1px solid var(--ato-line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ato-ink);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.recommendation-track {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  padding: 0.2rem 0.25rem 0.55rem;
+}
+
+.recommendation-item {
+  flex: 0 0 clamp(150px, 19vw, 205px);
+  scroll-snap-align: start;
+}
+
+.recommendation-item .product-card {
+  height: 100%;
 }
 
 .product-card {

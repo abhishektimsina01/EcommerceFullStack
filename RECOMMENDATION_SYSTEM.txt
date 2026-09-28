@@ -1,0 +1,50 @@
+Product Recommendation System
+==============================
+
+Overview
+--------
+The customer dashboard includes a horizontal "Recommended for you" carousel in
+the All Products view. It uses the existing product records and product cards.
+It does not create a separate product model or modify orders.
+
+Access and display
+------------------
+- The carousel is displayed only when the current user is an authenticated
+  customer.
+- It is hidden when a specific product category is selected.
+- The frontend requests recommendations from GET /api/products/recommendations.
+- The endpoint requires authentication and the CUSTOMER role.
+- The endpoint returns up to 12 products. The regular product grid is fetched
+  separately and remains intact.
+- Carousel cards reuse the normal ProductCard component. Horizontal scrolling
+  is confined to the carousel track.
+
+Recommendation logic
+--------------------
+1. The backend loads the available products and finds the customer's orders.
+   Order history is read regardless of order status.
+2. If there is no order history, the backend Fisher-Yates shuffles the product
+   list and returns up to 12 products. This makes the general recommendations
+   vary between requests.
+3. If orders exist, the backend records the categories and product IDs present
+   in those orders. Products from categories appearing more often in the order
+   history receive higher priority.
+4. Previously ordered product IDs are excluded when building recommendations.
+   The backend first chooses unseen products from previously ordered
+   categories. If none are available, it chooses any unseen products. If every
+   available product has already been ordered, it falls back to the full
+   product list.
+5. The selected list is limited to 12 products.
+
+Implementation locations
+------------------------
+- Backend/src/repository/order.repository.ts: reads customer order history
+  with related product IDs and categories.
+- Backend/src/service/products.service.ts: shuffles general products or ranks
+  order-history-based recommendations.
+- Backend/src/controller/products.controller.ts and
+  Backend/src/routes/product.routes.ts: expose the authenticated API endpoint.
+- Frontend/src/api/products.ts: calls the recommendations endpoint.
+- Frontend/src/pages/HomePage.tsx: loads and conditionally displays the
+  carousel using existing product cards.
+- Frontend/src/index.css: carousel layout and horizontal scrolling styles.

@@ -89,3 +89,13 @@ export const updateProduct = async (req : Request<Iparams>, res : Response, next
         next(err)
     }
 }
+
+export const getCustomerRecommendations = async (req : Request, res : Response, next : NextFunction) => {
+    try {
+        const response = await productService.getCustomerRecommendations(req.user)
+        return sendAPIResponse(res, "customer recommendations fetched", 200, response)
+    }
+    catch(err){
+        next(err)
+    }
+}
