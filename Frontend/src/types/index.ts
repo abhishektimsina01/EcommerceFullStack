@@ -107,7 +107,7 @@ export interface Order {
   quantity: number
   status: OrderStatus
   payment_id?: number | null
-  product?: OrderProduct
+  product?: OrderProduct | null
   address?: OrderAddress
   customer?: OrderCustomer
   total?: number

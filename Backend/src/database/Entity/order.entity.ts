@@ -32,8 +32,8 @@ export class Order {
     @JoinColumn({name : "payment_id"})
     payment !: Payment
 
-    @ManyToOne(() => Product, {onDelete : "CASCADE"})
+    @ManyToOne(() => Product, {nullable : true, onDelete : "SET NULL"})
     @JoinColumn({name : "product_id"})
-    product !: Product
+    product !: Product | null
 
 }

@@ -6,11 +6,13 @@ import { Ifilters, IjwtData, IproductItem } from "../interface/interfaces";
 import { ProductRepository } from "../repository/product.repository";
 import { extractKeysFromObj } from "../utils/checkKeyAndRetrieveValue";
 import { uploader } from "../utils/cloudinary.utils";
-import { UploadApiResponse } from "cloudinary";``
+import { UploadApiResponse } from "cloudinary";
 import { AdminRepository } from "../repository/admin.repository";
 import { CustomerRepository } from "../repository/customer.repository";
 import { OrderRepository } from "../repository/order.repository";
 import { ShopCartRepository } from "../repository/cart.repository";
+import { appDataSource } from "../database/connect.db";
+import { Product } from "../database/Entity/product.entity";
 
 
 export class ProductService {
@@ -133,7 +135,12 @@ export class ProductService {
             error.name = "NOT_FOUND"
             throw error
         }
-        await this.productRepo.deleteProduct(productId)
+        // Keep order history intact while removing the deleted product reference.
+        // Do this in one transaction so the old CASCADE FK cannot delete orders.
+        await appDataSource.transaction(async (manager) => {
+            await manager.query("UPDATE `order` SET `product_id` = NULL WHERE `product_id` = ?", [productId])
+            await manager.delete(Product, { product_id: productId })
+        })
     }
 
     public updateProduct = async (userData : IjwtData, productId : number, productData : Partial<IproductItem>) => {

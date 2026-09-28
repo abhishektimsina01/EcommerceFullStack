@@ -62,15 +62,17 @@ export function CartPage() {
         )}
         <div className="list-panel">
           {items.map((item) => (
-            <div className="list-row" key={item.cart_item_id}>
-              <img
-                src={resolveImageUrl(item.product_item.product_image)}
-                alt={item.product_item.product_name}
-              />
-              <div>
-                <h3 style={{ margin: '0 0 0.25rem' }}>{item.product_item.product_name}</h3>
-                <div className="product-price">{formatPrice(item.product_item.price)}</div>
-              </div>
+            <div className="list-row cart-list-row" key={item.cart_item_id}>
+              <Link className="cart-product-link" to={`/product/${item.product_item.product_id}`}>
+                <img
+                  src={resolveImageUrl(item.product_item.product_image)}
+                  alt={item.product_item.product_name}
+                />
+                <div>
+                  <h3 style={{ margin: '0 0 0.25rem' }}>{item.product_item.product_name}</h3>
+                  <div className="product-price">{formatPrice(item.product_item.price)}</div>
+                </div>
+              </Link>
               <div className="action-row">
                 <Link
                   className="btn btn-primary"

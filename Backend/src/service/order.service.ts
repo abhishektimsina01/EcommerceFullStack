@@ -96,16 +96,6 @@ export class OrderService {
 
     public viewOrders = async (userData : IjwtData) => {
         if(this.roleHelper.isCustomer(userData.role)){
-            if(await redisClient.exists(`viewOrders:${userData.id}`) != 0){
-                const cached = await redisClient.get(`viewOrders:${userData.id}`)
-                if(cached){
-                    try {
-                        return JSON.parse(cached)
-                    } catch {
-                        await redisClient.del(`viewOrders:${userData.id}`)
-                    }
-                }
-            }
             const customer = await this.customerRepo.findCustomer("user", {
                 user_id : userData.id
             }) as Customer
@@ -124,7 +114,6 @@ export class OrderService {
                 }
                 response.push(orderFormt)
             }
-            await redisClient.set(`viewOrders:${userData.id}`, JSON.stringify(response))
             return response 
         }
         // admin
