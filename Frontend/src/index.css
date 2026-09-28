@@ -339,53 +339,6 @@ h3,
   font-size: 0.8rem;
 }
 
-/* Hero — compact strip */
-.hero {
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  min-height: 0;
-  height: 110px;
-  margin: 0;
-  color: #fff;
-  background:
-    linear-gradient(105deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.4) 55%, rgba(245, 114, 36, 0.35) 100%),
-    url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80')
-      center/cover no-repeat;
-  display: flex;
-  align-items: center;
-  padding: 0.85rem 1.15rem;
-}
-
-.hero-content {
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.hero-brand {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 800;
-  line-height: 1;
-  margin: 0;
-}
-
-.hero p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #f8fafc;
-  max-width: 36ch;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-left: auto;
-}
-
 /* Categories */
 .category-row {
   display: flex;
@@ -433,51 +386,91 @@ h3,
 .product-grid {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  grid-auto-rows: minmax(0, 1fr);
-  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-auto-rows: max-content;
+  gap: 1rem;
   align-content: start;
+  padding: 0.25rem 0.4rem 0.85rem 0;
 }
 
 .product-card {
   background: var(--ato-surface);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 10px;
+  border: 1px solid var(--ato-line);
+  border-radius: 14px;
   overflow: hidden;
-  min-height: 0;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  animation: fadeUp 0.35s ease both;
 }
 
 .product-card:hover {
+  transform: translateY(-3px);
   box-shadow: var(--shadow-soft);
+  border-color: rgba(245, 114, 36, 0.45);
 }
 
 .product-card img {
   width: 100%;
-  aspect-ratio: 1.15;
-  max-height: 110px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   background: var(--ato-cream);
-  flex-shrink: 0;
 }
 
 .product-card-body {
-  padding: 0.45rem 0.55rem 0.55rem;
-  min-height: 0;
+  padding: 0.6rem 0.7rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .product-card h3 {
-  margin: 0 0 0.15rem;
-  font-size: 0.82rem;
-  line-height: 1.25;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  min-height: 2.34em;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Admin catalogue card — image/title link + action buttons */
+.admin-product-card {
+  animation: fadeUp 0.35s ease both;
+}
+
+.admin-product-card .product-card-link {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+}
+
+.admin-product-card:hover {
+  transform: none;
+}
+
+.admin-product-card .product-card-link:hover {
+  color: inherit;
+}
+
+.product-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 0.7rem 0.7rem;
+  margin-top: auto;
+}
+
+.product-card-actions .btn {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+}
+
 
 .product-type {
   font-size: 0.65rem;
@@ -546,6 +539,65 @@ h3,
   align-items: center;
   gap: 0.55rem;
   margin: 0.65rem 0;
+}
+
+/* Clickable list/table rows */
+.clickable-row {
+  cursor: pointer;
+}
+
+tr.clickable-row:hover,
+.list-row.clickable-row:hover {
+  background: var(--ato-cream);
+}
+
+/* Order detail */
+.order-info {
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.order-info > h1 {
+  margin: 0.15rem 0;
+  font-size: 1.35rem;
+}
+
+.order-info > .status-badge {
+  align-self: flex-start;
+}
+
+.order-detail-block {
+  border-top: 1px solid var(--ato-line);
+  padding-top: 0.7rem;
+  margin-top: 0.35rem;
+}
+
+.order-detail-block h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.detail-grid dt {
+  color: var(--ato-muted);
+  font-weight: 500;
+}
+
+.detail-grid dd {
+  margin: 0;
+  text-align: right;
+  word-break: break-word;
 }
 
 .qty-row input {
@@ -842,16 +894,17 @@ h3,
 .admin-table-wrap {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid var(--ato-line);
+  border-radius: 10px;
+  background: #fff;
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--ato-line);
 }
 
 .admin-table th,
@@ -862,9 +915,16 @@ h3,
   font-size: 0.82rem;
 }
 
-.admin-table th {
+.admin-table thead th {
   background: #fff7ed;
   font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.admin-table tbody tr.row-active {
+  background: #fff7ed;
 }
 
 .admin-table img {
@@ -907,8 +967,8 @@ h3,
 
 .admin-manage-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 340px) 1fr;
-  gap: 0.75rem;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 0.85rem;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -921,9 +981,51 @@ h3,
 }
 
 .admin-manage-layout > form {
-  padding: 0.75rem !important;
+  padding: 0 !important;
+}
+
+.admin-form-card {
   display: flex;
   flex-direction: column;
+}
+
+.admin-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--ato-line);
+  background: linear-gradient(180deg, #ffffff, #fff7f0);
+  flex-shrink: 0;
+}
+
+.admin-form-head h3 {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+.admin-form-body {
+  padding: 0.85rem;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+.admin-form-body .field:last-child {
+  margin-bottom: 0;
+}
+
+.admin-form-actions {
+  padding: 0.7rem 0.85rem;
+  border-top: 1px solid var(--ato-line);
+  background: #fff;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.admin-form-actions .btn {
+  flex: 1;
 }
 
 @media (max-width: 860px) {
@@ -933,15 +1035,6 @@ h3,
 
   .search-bar {
     display: none;
-  }
-
-  .hero {
-    height: auto;
-    min-height: 72px;
-  }
-
-  .hero-actions {
-    margin-left: 0;
   }
 
   .detail-layout {

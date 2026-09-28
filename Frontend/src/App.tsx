@@ -5,6 +5,7 @@ import { CustomerLayout } from './components/layout/CustomerLayout'
 import { AuthProvider } from './context/AuthContext'
 import { AuthGateProvider } from './context/AuthGateContext'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
+import { AdminOrderDetailPage } from './pages/admin/AdminOrderDetailPage'
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage'
 import { AdminProductDetailPage } from './pages/admin/AdminProductDetailPage'
 import { AdminProductsPage } from './pages/admin/AdminProductsPage'
@@ -15,6 +16,7 @@ import { CheckoutPage } from './pages/CheckoutPage'
 import { CustomerLoginPage } from './pages/CustomerLoginPage'
 import { CustomerSignupPage } from './pages/CustomerSignupPage'
 import { HomePage } from './pages/HomePage'
+import { OrderDetailPage } from './pages/OrderDetailPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { PaymentResultPage } from './pages/PaymentResultPage'
 import { ProductDetailPage } from './pages/ProductDetailPage'
@@ -32,6 +34,7 @@ export default function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout/:id" element={<CheckoutPage />} />
               <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/orders/:id" element={<OrderDetailPage />} />
               <Route path="/customer/login" element={<CustomerLoginPage />} />
               <Route path="/customer/signup" element={<CustomerSignupPage />} />
               <Route path="/payment/success" element={<PaymentResultPage success />} />
@@ -48,6 +51,7 @@ export default function App() {
               <Route path="product/:id" element={<AdminProductDetailPage />} />
               <Route path="products" element={<AdminProductsPage />} />
               <Route path="orders" element={<AdminOrdersPage />} />
+              <Route path="orders/:id" element={<AdminOrderDetailPage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

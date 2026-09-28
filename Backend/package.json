@@ -9,6 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "local": "node dist/server.js",
     "worker": "tsx watch src/workers/workers.ts",
+    "seed": "tsx src/seed/products.seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

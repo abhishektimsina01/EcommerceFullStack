@@ -1,17 +1,10 @@
-import { useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { StoreFooter } from '../components/layout/StoreFooter'
 import { StoreHeader } from '../components/layout/StoreHeader'
 
 export function PaymentResultPage({ success }: { success: boolean }) {
   const [params] = useSearchParams()
-  const navigate = useNavigate()
   const orderId = params.get('order_id')
-
-  useEffect(() => {
-    const timer = setTimeout(() => navigate('/orders'), 3500)
-    return () => clearTimeout(timer)
-  }, [navigate])
 
   return (
     <div className="app-shell">
@@ -22,9 +15,16 @@ export function PaymentResultPage({ success }: { success: boolean }) {
           <h1>{success ? 'Payment successful' : 'Payment failed'}</h1>
           <p className="muted">
             {orderId ? `Order #${orderId}` : 'Your order'}{' '}
-            {success ? 'was paid.' : 'could not be completed.'}
+            {success ? 'was paid. You can review it in My Orders.' : 'could not be completed. You can retry payment from My Orders.'}
           </p>
-          <p className="muted">Redirecting to your orders…</p>
+          <div className="action-row" style={{ justifyContent: 'center', marginTop: '1rem' }}>
+            <Link className="btn btn-primary" to="/orders">
+              View orders
+            </Link>
+            <Link className="btn btn-ghost" to="/">
+              Continue shopping
+            </Link>
+          </div>
         </div>
       </main>
       <StoreFooter />

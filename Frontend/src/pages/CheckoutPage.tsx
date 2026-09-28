@@ -6,6 +6,7 @@ import { StoreFooter } from '../components/layout/StoreFooter'
 import { StoreHeader } from '../components/layout/StoreHeader'
 import { useAuth } from '../context/AuthContext'
 import type { Product } from '../types'
+import { submitEsewaForm } from '../utils/esewa'
 import { formatPrice, resolveImageUrl } from '../utils/format'
 
 export function CheckoutPage() {
@@ -51,19 +52,10 @@ export function CheckoutPage() {
       if (!orderId) throw new Error('Order created but no order id returned')
 
       const pay = await initiateEsewa(orderId)
-      const { action, fields } = pay.details!
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = action
-      Object.entries(fields).forEach(([key, value]) => {
-        const input = document.createElement('input')
-        input.type = 'hidden'
-        input.name = key
-        input.value = value
-        form.appendChild(input)
-      })
-      document.body.appendChild(form)
-      form.submit()
+      if (!pay.details?.action || !pay.details.fields) {
+        throw new Error('Payment could not be started. Open My Orders to pay this order.')
+      }
+      submitEsewaForm(pay.details)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Checkout failed')
       setLoading(false)

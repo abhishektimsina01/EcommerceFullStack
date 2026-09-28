@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { getProducts } from '../api/products'
+import { getProducts, getRecommendedProducts } from '../api/products'
 import { ProductCard } from '../components/products/ProductCard'
 import { StoreFooter } from '../components/layout/StoreFooter'
 import { StoreHeader } from '../components/layout/StoreHeader'
+import { useAuth } from '../context/AuthContext'
 import { PRODUCT_CATEGORIES, type Product, type ProductType } from '../types'
 
 export function HomePage() {
   const [params, setParams] = useSearchParams()
+  const { isCustomer } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -19,7 +21,13 @@ export function HomePage() {
   useEffect(() => {
     let alive = true
     setLoading(true)
-    getProducts(category ? { product_type: category } : {})
+    // logged-in customers browsing the full catalogue get a per-user recommended
+    // ordering; a category filter or an anonymous visitor gets the default listing.
+    const request =
+      !category && isCustomer
+        ? getRecommendedProducts()
+        : getProducts(category ? { product_type: category } : {})
+    request
       .then((res) => {
         if (alive) setProducts(res.details ?? [])
       })
@@ -32,7 +40,7 @@ export function HomePage() {
     return () => {
       alive = false
     }
-  }, [category])
+  }, [category, isCustomer])
 
   const filtered = useMemo(() => {
     if (!q.trim()) return products
@@ -85,22 +93,6 @@ export function HomePage() {
             </button>
           </div>
         )}
-
-        <section className="hero">
-          <div className="hero-content">
-            <h1 className="hero-brand">ATO Store</h1>
-            <p>Browse freely — login when you are ready to buy.</p>
-            <div className="hero-actions">
-              <Link
-                className="btn btn-ghost"
-                to="/customer/login"
-                style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.35)' }}
-              >
-                Login
-              </Link>
-            </div>
-          </div>
-        </section>
 
         <div className="category-row">
           {PRODUCT_CATEGORIES.map((cat) => (

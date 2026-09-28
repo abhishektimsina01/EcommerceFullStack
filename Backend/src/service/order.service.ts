@@ -45,7 +45,7 @@ export class OrderService {
         }
         const isCart = await this.shopCartRepo.findCart(customer.customer_id)
 
-        // for address
+        // snapshot a dedicated address row so a unique order.address_id index cannot block later orders
         let address_id : number
         if(orderData.current_address.address){
             const address = await this.addressRepo.addAddress(orderData.current_address.address)
@@ -53,7 +53,16 @@ export class OrderService {
         }
         else{
             const user = await this.userRepo.findUser("user_id", userData.id) as User
-            address_id = user.address.address_id
+            if(!user?.address){
+                throw new APIError("no default address found", 400)
+            }
+            const snapshot = await this.addressRepo.addAddress({
+                city : user.address.city,
+                state : user.address.state,
+                address_line : user.address.address_line || undefined,
+                postal_code : user.address.postal_code || undefined
+            })
+            address_id = snapshot.address_id
         }
 
         // find the product
@@ -63,6 +72,8 @@ export class OrderService {
         }
 
         // check for the product
+        console.log(products.quantity)
+        console.log(fetched_product.stock)
         if(products.quantity > fetched_product.stock){
             // item out of the stock oh no!!
             throw new APIError("order failed", 404, {
@@ -79,13 +90,21 @@ export class OrderService {
             await this.shopCartRepo.deleteCartItem(isCart.cart_id, products.product_id)
         }
         await redisClient.del(`viewOrder:${userData.id}`)
+        await redisClient.del(`viewOrders:${userData.id}`)
         return order
     }
 
     public viewOrders = async (userData : IjwtData) => {
         if(this.roleHelper.isCustomer(userData.role)){
-            if(await redisClient.exists(`viewOrder:${userData.id}`) != 0){
-                return await redisClient.get(`viewOrder:${userData.id}`)
+            if(await redisClient.exists(`viewOrders:${userData.id}`) != 0){
+                const cached = await redisClient.get(`viewOrders:${userData.id}`)
+                if(cached){
+                    try {
+                        return JSON.parse(cached)
+                    } catch {
+                        await redisClient.del(`viewOrders:${userData.id}`)
+                    }
+                }
             }
             const customer = await this.customerRepo.findCustomer("user", {
                 user_id : userData.id
@@ -111,7 +130,10 @@ export class OrderService {
         // admin
         else if(this.roleHelper.isAdmin(userData.role)){
             const orders = await this.orderRepo.findAllOrder()
-            return orders
+            return orders.map((order) => ({
+                ...order,
+                payment_id : order.payment?.payment_id ?? null
+            }))
         }
     }
     
@@ -129,6 +151,7 @@ export class OrderService {
         }
         return {
             ...order,
+            payment_id : order.payment?.payment_id ?? null,
             total : order.price * order.quantity
         }
     }
@@ -150,7 +173,7 @@ export class OrderService {
         }
         else{
             if(state === ORDER_STATUS.CANCELED){
-                if(order.status === ORDER_STATUS.PENDING || order.status === ORDER_STATUS.PROCESSING){
+                if(order.status === ORDER_STATUS.PENDING || order.status === ORDER_STATUS.PROCESSING || order.status === ORDER_STATUS.CONFIRMED){
                     order.status = ORDER_STATUS.CANCELED
                     return await this.orderRepo.orderRepo.save(order)
                 }
@@ -159,14 +182,14 @@ export class OrderService {
                 }
             }
             else if(state === ORDER_STATUS.PROCESSING){
-                if(order.status === ORDER_STATUS.PENDING){
+                if(order.status === ORDER_STATUS.PENDING || order.status === ORDER_STATUS.CONFIRMED){
                     order.status = ORDER_STATUS.PROCESSING
                     return await this.orderRepo.orderRepo.save(order)
                 }
             }
             else if(state === ORDER_STATUS.DELIVERED){
                 if(order.status === ORDER_STATUS.PROCESSING){
-                    order.status === ORDER_STATUS.PROCESSING
+                    order.status = ORDER_STATUS.DELIVERED
                     return await this.orderRepo.orderRepo.save(order)
                 }
             }
@@ -179,8 +202,7 @@ export class OrderService {
     public deleteOrder = async (userData : IjwtData, order_id : number) => {
         const order = await this.orderRepo.findOrder("order_id", order_id)
         if(!order){
-            const err =  new APIError("order was not found", 404)
-            err.name = "ORDER_NOT_FOUND"
+            throw new APIError("order was not found", 404)
         }
         await this.orderRepo.deleteOrder(order_id)
     }

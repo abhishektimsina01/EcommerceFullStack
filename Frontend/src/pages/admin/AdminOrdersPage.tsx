@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { getOrders, updateOrderStatus } from '../../api/orders'
 import { ORDER_STATUSES, type Order, type OrderStatus } from '../../types'
 import { formatPrice, resolveImageUrl } from '../../utils/format'
 
 export function AdminOrdersPage() {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -62,7 +64,11 @@ export function AdminOrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.order_id}>
+                <tr
+                  key={order.order_id}
+                  className="clickable-row"
+                  onClick={() => navigate(`/admin/orders/${order.order_id}`)}
+                >
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <img src={resolveImageUrl(order.product?.product_image)} alt="" />
@@ -78,8 +84,11 @@ export function AdminOrdersPage() {
                   </td>
                   <td>
                     <span className={`status-badge ${order.status}`}>{order.status}</span>
+                    <div className="muted" style={{ fontSize: '0.75rem' }}>
+                      {order.payment_id ? 'Paid' : 'Unpaid'}
+                    </div>
                   </td>
-                  <td>
+                  <td onClick={(e) => e.stopPropagation()}>
                     <select
                       value={order.status}
                       onChange={(e) => changeStatus(order.order_id, e.target.value as OrderStatus)}

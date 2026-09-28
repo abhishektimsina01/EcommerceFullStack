@@ -1,6 +1,8 @@
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Order } from "../database/Entity/order.entity";
+import { Payment } from "../database/Entity/payment.entity";
 import { appDataSource } from "../database/connect.db";
+import { ITEM_CATEGORY, ORDER_STATUS } from "../enum/enums";
 
 
 export class OrderRepository {
@@ -57,7 +59,10 @@ export class OrderRepository {
                 address : {
                     address_id: true,
                     state : true,
-                    city : true
+                    city : true,
+                    address_line : true,
+                    postal_code : true,
+                    created_at : true
                 },
                 customer : {
                     customer_id : true,
@@ -79,7 +84,7 @@ export class OrderRepository {
             }
         })
     }
-    
+
     public findOrder = async <T>(key : string, value : T) => {
         return await this.orderRepo.findOne({
             where : {
@@ -101,7 +106,10 @@ export class OrderRepository {
                 address : {
                     address_id: true,
                     state : true,
-                    city : true
+                    city : true,
+                    address_line : true,
+                    postal_code : true,
+                    created_at : true
                 }
             },
             relations : {
@@ -157,6 +165,39 @@ export class OrderRepository {
                 payment : true
             }
         })
+    }
+
+    // product categories this customer has ordered — feeds per-user recommendations
+    public getOrderedCategories = async (customer_id : number) : Promise<ITEM_CATEGORY[]> => {
+        const orders = await this.orderRepo.find({
+            where : {
+                customer : {
+                    customer_id : customer_id
+                }
+            },
+            select : {
+                order_id : true,
+                product : {
+                    product_id : true,
+                    product_type : true
+                }
+            },
+            relations : {
+                product : true
+            }
+        })
+        return orders
+            .map((order) => order.product?.product_type)
+            .filter((category) : category is ITEM_CATEGORY => Boolean(category))
+    }
+
+    public markOrderPaid = async (orderId : number, payment : Payment) => {
+        await this.orderRepo.update({ order_id : orderId }, { status : ORDER_STATUS.CONFIRMED })
+        await this.orderRepo
+            .createQueryBuilder()
+            .relation(Order, "payment")
+            .of(orderId)
+            .set(payment)
     }
 
     public deleteOrder = async (orderId : number) => {

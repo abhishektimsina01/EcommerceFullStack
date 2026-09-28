@@ -5,6 +5,7 @@ import { StoreFooter } from '../components/layout/StoreFooter'
 import { StoreHeader } from '../components/layout/StoreHeader'
 import { useAuth } from '../context/AuthContext'
 import type { Order } from '../types'
+import { submitEsewaForm } from '../utils/esewa'
 import { formatPrice, resolveImageUrl } from '../utils/format'
 
 export function OrdersPage() {
@@ -28,19 +29,10 @@ export function OrdersPage() {
   async function payAgain(orderId: number) {
     try {
       const pay = await initiateEsewa(orderId)
-      const { action, fields } = pay.details!
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = action
-      Object.entries(fields).forEach(([key, value]) => {
-        const input = document.createElement('input')
-        input.type = 'hidden'
-        input.name = key
-        input.value = value
-        form.appendChild(input)
-      })
-      document.body.appendChild(form)
-      form.submit()
+      if (!pay.details?.action || !pay.details.fields) {
+        throw new Error('Payment could not be started')
+      }
+      submitEsewaForm(pay.details)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment failed')
     }
@@ -64,7 +56,19 @@ export function OrdersPage() {
         )}
         <div className="list-panel">
           {orders.map((order) => (
-            <div className="list-row" key={order.order_id}>
+            <div
+              className="list-row clickable-row"
+              key={order.order_id}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/orders/${order.order_id}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  navigate(`/orders/${order.order_id}`)
+                }
+              }}
+            >
               <img
                 src={resolveImageUrl(order.product?.product_image)}
                 alt={order.product?.product_name || 'Order'}
@@ -77,10 +81,20 @@ export function OrdersPage() {
                   Qty {order.quantity} · {formatPrice(order.price * order.quantity)}
                 </p>
                 <span className={`status-badge ${order.status}`}>{order.status}</span>
+                {order.payment_id ? (
+                  <p className="muted" style={{ margin: '0.35rem 0 0' }}>Paid</p>
+                ) : null}
               </div>
               <div className="action-row">
                 {!order.payment_id && order.status !== 'canceled' && (
-                  <button className="btn btn-primary" type="button" onClick={() => payAgain(order.order_id)}>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      payAgain(order.order_id)
+                    }}
+                  >
                     Pay with eSewa
                   </button>
                 )}

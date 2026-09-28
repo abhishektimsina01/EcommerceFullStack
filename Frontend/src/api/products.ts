@@ -19,6 +19,17 @@ export function getProducts(filters: ProductFilters = {}) {
   return apiRequest<Product[]>(`/api/products${query ? `?${query}` : ''}`)
 }
 
+export function getRecommendedProducts(filters: ProductFilters = {}) {
+  const params = new URLSearchParams()
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== '' && value !== null) {
+      params.set(key, String(value))
+    }
+  })
+  const query = params.toString()
+  return apiRequest<Product[]>(`/api/products/recommended${query ? `?${query}` : ''}`)
+}
+
 export function getProduct(id: number) {
   return apiRequest<Product>(`/api/product/${id}`)
 }

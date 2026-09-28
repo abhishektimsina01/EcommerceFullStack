@@ -80,6 +80,27 @@ export interface OrderProduct {
   description?: string | null
 }
 
+export interface OrderAddress {
+  address_id: number
+  city: string
+  state: string
+  address_line?: string | null
+  postal_code?: string | null
+  created_at?: string
+}
+
+export interface OrderCustomerUser {
+  user_id: number
+  username: string
+  phone_number?: string | number | null
+  email?: string | null
+}
+
+export interface OrderCustomer {
+  customer_id: number
+  user: OrderCustomerUser
+}
+
 export interface Order {
   order_id: number
   price: number
@@ -87,6 +108,8 @@ export interface Order {
   status: OrderStatus
   payment_id?: number | null
   product?: OrderProduct
+  address?: OrderAddress
+  customer?: OrderCustomer
   total?: number
 }
 

@@ -15,5 +15,6 @@ export const notFound = (req : Request, res : Response, next : NextFunction) => 
 
 export const errorHandler = (err : APIError, req : Request, res : Response, next : NextFunction) => {
     console.log("error occurred❌")
-    return sendErrorResponse(res, err.name, err.message, err.statusCode, err.details)
+    const statusCode = err.statusCode || 500
+    return sendErrorResponse(res, err.name || "ERROR", err.message || "internal error", statusCode, err.details)
 }

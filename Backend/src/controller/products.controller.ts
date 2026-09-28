@@ -41,6 +41,18 @@ export const getProducts = async (req : Request, res : Response, next : NextFunc
     }
 }
 
+export const getRecommendedProducts = async (req : Request, res : Response, next : NextFunction) => {
+    try {
+        const filters : Ifilters = req.query
+        const purifiedFilter = extractKeysFromObj(filters as Record<string, unknown>, ProductFilterConstant[ROLES.CUSTOMER])
+        const response = await productService.getRecommendedProducts(req.user, purifiedFilter as Ifilters)
+        return sendAPIResponse(res, "recommended products fetched", 200, response)
+    }
+    catch(err){
+        next(err)
+    }
+}
+
 export const getProduct = async (req : Request<Iparams>, res : Response, next : NextFunction) => {
     try{
         const user = req.user ?? { id: 0, username: "guest", role: ROLES.CUSTOMER }

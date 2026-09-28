@@ -1,33 +1,47 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { getProducts } from '../../api/products'
-import { ProductCard } from '../../components/products/ProductCard'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { deleteProduct, getProducts } from '../../api/products'
+import { AdminProductCard } from '../../components/products/AdminProductCard'
 import { PRODUCT_CATEGORIES, type Product, type ProductType } from '../../types'
 
 export function AdminDashboard() {
+  const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [category, setCategory] = useState<ProductType | ''>('')
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    let alive = true
+  const load = useCallback(async () => {
     setLoading(true)
-    getProducts(category ? { product_type: category } : {})
-      .then((res) => {
-        if (alive) setProducts(res.details ?? [])
-      })
-      .catch((err) => {
-        if (alive) setError(err instanceof Error ? err.message : 'Failed to load products')
-      })
-      .finally(() => {
-        if (alive) setLoading(false)
-      })
-    return () => {
-      alive = false
+    setError('')
+    try {
+      const res = await getProducts(category ? { product_type: category } : {})
+      setProducts(res.details ?? [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load products')
+    } finally {
+      setLoading(false)
     }
   }, [category])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  function handleEdit(product: Product) {
+    navigate(`/admin/products?edit=${product.product_id}`)
+  }
+
+  async function handleDelete(product: Product) {
+    if (!confirm(`Delete "${product.product_name}"?`)) return
+    try {
+      await deleteProduct(product.product_id)
+      await load()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Delete failed')
+    }
+  }
 
   const filtered = useMemo(() => {
     if (!search.trim()) return products
@@ -99,11 +113,12 @@ export function AdminDashboard() {
       {!loading && !error && filtered.length > 0 && (
         <div className="product-grid">
           {filtered.map((product, index) => (
-            <ProductCard
+            <AdminProductCard
               key={product.product_id}
               product={product}
               index={index}
-              to={`/admin/product/${product.product_id}`}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           ))}
         </div>

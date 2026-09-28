@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Customer } from "./customer.entity";
 import { ORDER_STATUS } from "../../enum/enums";
 import { Payment } from "./payment.entity";
@@ -24,7 +24,7 @@ export class Order {
     @Column({type : "int"})
     quantity !: number
 
-    @OneToOne(() => Address, {onDelete : "CASCADE"})
+    @ManyToOne(() => Address, {onDelete : "CASCADE"})
     @JoinColumn({name : "address_id"})
     address !: Address
 

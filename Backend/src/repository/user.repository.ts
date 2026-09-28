@@ -24,7 +24,10 @@ export class UserRepository {
                 password : is_password,
                 address : {
                     address_id : true,
-                    city : true
+                    city : true,
+                    state : true,
+                    address_line : true,
+                    postal_code : true,
                 },
             },
             relations : {
